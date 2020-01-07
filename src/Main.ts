@@ -1,5 +1,6 @@
 import 'phaser';
 import { PreloadScene } from './Scenes/PreloadScene';
+import { Zhed } from './Scenes/Zhed';
 import { COLOR } from './Color';
 
 const config: GameConfig = {
@@ -7,7 +8,7 @@ const config: GameConfig = {
   width: 800,
   height: 600,
   parent: 'game',
-  scene: [PreloadScene],
+  scene: [PreloadScene, Zhed],
   backgroundColor: COLOR.DARK_IMPERIAL_BLUE,
 };
 
