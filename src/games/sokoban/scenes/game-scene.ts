@@ -6,7 +6,7 @@ const PLAYER = 2;
 const SPOT = 4;
 const CRATE = 8;
 
-export class Sokoban extends Phaser.Scene {
+export class GameScene extends Phaser.Scene {
   private staticAssetsGroup: Phaser.GameObjects.Container;
   private movingAssetsGroup: Phaser.GameObjects.Container;
   private crates: Phaser.GameObjects.Sprite[][];
@@ -20,8 +20,8 @@ export class Sokoban extends Phaser.Scene {
   }
 
   protected preload(): void {
-    this.load.json('level', 'assets/sokoban/level.json');
-    this.load.spritesheet('tiles', 'assets/sokoban/sokoban.png', {
+    this.load.json('level', '/src/games/sokoban/assets/level.json');
+    this.load.spritesheet('tiles', './src/games/sokoban/assets/sokoban.png', {
       frameWidth: 128,
       frameHeight: 128,
     });
