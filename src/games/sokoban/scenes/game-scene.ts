@@ -1,96 +1,106 @@
 import 'phaser';
+import { Sokoban } from '../game/sokoban';
+import { SokobanItem } from '../game/sokoban-item';
 
-const EMPTY = 0;
-const WALL = 1;
-const PLAYER = 2;
-const SPOT = 4;
-const CRATE = 8;
+const SIZE: number = 128;
+const TWEEN_DURATION: number = 100;
 
 export class GameScene extends Phaser.Scene {
+  private sokoban: Sokoban;
+
   private staticAssetsGroup: Phaser.GameObjects.Container;
   private movingAssetsGroup: Phaser.GameObjects.Container;
-  private crates: Phaser.GameObjects.Sprite[][];
   private player: Phaser.GameObjects.Sprite;
-  private playerData: { isMoving: boolean; col: number; row: number };
-  private level: number[][];
+  private crates: Map<SokobanItem, Phaser.GameObjects.Sprite>;
   private currentLevel: number;
 
   constructor() {
     super({ key: 'Sokoban' });
+    this.sokoban = new Sokoban();
+    this.crates = new Map<SokobanItem, Phaser.GameObjects.Sprite>();
   }
 
   protected preload(): void {
     this.load.json('level', '/src/games/sokoban/assets/level.json');
     this.load.spritesheet('tiles', './src/games/sokoban/assets/sokoban.png', {
-      frameWidth: 128,
-      frameHeight: 128,
+      frameWidth: SIZE,
+      frameHeight: SIZE,
     });
   }
 
   protected create(data: any): void {
     this.currentLevel = data.level || 0;
-    this.playerData = { isMoving: false, col: 0, row: 0 };
-    this.createLevel();
-    this.handlers();
+    const levels = this.cache.json.get('level');
+    this.sokoban.buildLevel(levels[this.currentLevel]);
 
+    this.setupBoard();
+    this.createLevel();
+    this.createPlayer();
+    this.createCrates();
+    this.handlers();
   }
 
-  private createLevel(): void {
-    const levels = this.cache.json.get('level');
-    this.level = levels[this.currentLevel];
-
-    const boardWidth = 128 * 8;
-    const boardHeight = 128 * 8;
+  private setupBoard(): void {
+    const boardWidth = SIZE * this.sokoban.getLevelCols();
+    const boardHeight = SIZE * this.sokoban.getLevelRows();
     const { width, height } = this.sys.game.canvas;
     const zoom = Math.min(width / boardWidth, height / boardHeight);
     this.cameras.main.setZoom(zoom);
 
     const board = this.add.container(
-      (width - boardWidth + 128) * 0.5,
-      (height - boardHeight + 128) * 0.5,
+      (width - boardWidth + SIZE) * 0.5,
+      (height - boardHeight + SIZE) * 0.5,
     );
 
     this.staticAssetsGroup = this.add.container(0, 0);
     board.add(this.staticAssetsGroup);
     this.movingAssetsGroup = this.add.container(0, 0);
     board.add(this.movingAssetsGroup);
+  }
 
-    this.crates = [];
+  private createLevel(): void {
+    for (let i = 0; i < this.sokoban.getLevelRows(); i++) {
+      for (let j = 0; j < this.sokoban.getLevelCols(); j++) {
+        const position = new Phaser.Math.Vector2(j, i);
 
-    for (let i = 0; i < this.level.length; i++) {
-      this.crates[i] = [];
-      for (let j = 0; j < this.level[i].length; j++) {
-        // floor
-        const floor = this.add.sprite(128 * j, 128 * i, 'tiles');
-        floor.setFrame(89);
-        this.staticAssetsGroup.add(floor);
+        this.staticAssetsGroup.add(
+          this.add.sprite(position.x * SIZE, position.y * SIZE, 'tiles', 89),
+        );
 
-        // tile
-        const tile = this.add.sprite(128 * j, 128 * i, 'tiles');
-
-        switch (this.level[i][j]) {
-          case WALL:
-            tile.setFrame(98);
-            this.staticAssetsGroup.add(tile);
+        switch (this.sokoban.getItemAt(position)) {
+          case Sokoban.WALL:
+            this.staticAssetsGroup.add(
+              this.add.sprite(position.x * SIZE, position.y * SIZE, 'tiles', 98),
+            );
             break;
-          case PLAYER:
-            this.player = tile;
-            this.player.setFrame(65);
-            this.playerData.col = j;
-            this.playerData.row = i;
-            this.movingAssetsGroup.add(this.player);
+          case Sokoban.GOAL:
+            this.staticAssetsGroup.add(
+              this.add.sprite(position.x * SIZE, position.y * SIZE, 'tiles', 13),
+            );
             break;
-          case SPOT:
-            tile.setFrame(13);
-            this.staticAssetsGroup.add(tile);
-            break;
-          case CRATE:
-            tile.setFrame(8);
-            this.movingAssetsGroup.add(tile);
-            this.crates[i][j] = tile;
         }
       }
     }
+  }
+
+  private createPlayer(): void {
+    const player = this.sokoban.getPlayer();
+    this.player = this.add.sprite(
+      player.x * SIZE,
+      player.y * SIZE,
+      'tiles',
+      65,
+    );
+    this.movingAssetsGroup.add(this.player);
+  }
+
+  private createCrates(): void {
+    this.crates.clear();
+    this.sokoban.getCrates().forEach((crate: SokobanItem) => {
+      const tile = this.add.sprite(crate.x * SIZE, crate.y * SIZE, 'tiles', 8);
+      this.movingAssetsGroup.add(tile);
+      this.crates.set(crate, tile);
+    });
   }
 
   private handlers() {
@@ -100,124 +110,67 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-RIGHT', this.moveRight, this);
   }
 
-  // move player to up
   private moveUp() {
-    if (!this.playerData.isMoving) {
-      this.handleMovement(0, -1);
-      this.player.setFrame(68);
-    }
+    this.sokoban.moveUp();
+    this.handleMovement();
+    this.player.setFrame(68);
   }
 
-  // move player to down
   private moveDown() {
-    if (!this.playerData.isMoving) {
-      this.handleMovement(0, 1);
-      this.player.setFrame(65);
-    }
+    this.sokoban.moveDown();
+    this.handleMovement();
+    this.player.setFrame(65);
   }
 
-  // move player to left
   private moveLeft() {
-    if (!this.playerData.isMoving) {
-      this.handleMovement(-1, 0);
-      this.player.setFrame(94);
-    }
+    this.sokoban.moveLeft();
+    this.handleMovement();
+    this.player.setFrame(94);
   }
 
-  // move player to right
   private moveRight() {
-    if (!this.playerData.isMoving) {
-      this.handleMovement(1, 0);
-      this.player.setFrame(91);
-    }
+    this.sokoban.moveRight();
+    this.handleMovement();
+    this.player.setFrame(91);
   }
 
-  private handleMovement(deltaX, deltaY) {
-    if (
-      this.isWalkable(
-        this.playerData.col + deltaX,
-        this.playerData.row + deltaY,
-      )
-    ) {
-      this.movePlayer(deltaX, deltaY);
-    } else if (
-      this.isCrate(this.playerData.col + deltaX, this.playerData.row + deltaY)
-    ) {
-      if (
-        this.isWalkable(
-          this.playerData.col + 2 * deltaX,
-          this.playerData.row + 2 * deltaY,
-        )
-      ) {
-        this.moveCrate(deltaX, deltaY);
-        this.movePlayer(deltaX, deltaY);
-      }
-    }
+  private handleMovement(): void {
+    this.movePlayer();
+    this.moveCrates();
   }
 
-  private isWalkable(posX, posY) {
-    return this.level[posY][posX] === EMPTY || this.level[posY][posX] === SPOT;
-  }
-
-  private isCrate(posX, posY) {
-    return (
-      this.level[posY][posX] === CRATE ||
-      this.level[posY][posX] === CRATE + SPOT
-    );
-  }
-
-  private movePlayer(deltaX, deltaY) {
-    this.playerData.isMoving = true;
+  private movePlayer(): void {
+    const player = this.sokoban.getPlayer();
 
     this.tweens.add({
       targets: this.player,
-      x: this.player.x + deltaX * 128,
-      y: this.player.y + deltaY * 128,
-      duration: 100,
+      x: player.x * SIZE,
+      y: player.y * SIZE,
+      duration: TWEEN_DURATION,
       ease: 'Linear',
       onComplete: () => {
-        if (this.isLevelSolved()) {
+        if (this.sokoban.isLevelSolved()) {
           this.input.keyboard.removeAllListeners();
           setTimeout(() => {
             this.scene.restart({ level: this.currentLevel + 1 });
-          },         1000);
-        } else {
-          this.playerData.isMoving = false;
+          // tslint:disable-next-line: align
+          }, 1000);
         }
-
-        this.level[this.playerData.row][this.playerData.col] -= PLAYER;
-        this.playerData.col += deltaX;
-        this.playerData.row += deltaY;
-        this.level[this.playerData.row][this.playerData.col] += PLAYER;
       },
     });
   }
 
-  private moveCrate(deltaX, deltaY) {
-    const crate = this.crates[this.playerData.row + deltaY][this.playerData.col + deltaX];
-    this.tweens.add({
-      targets: crate,
-      x: crate.x + deltaX * 128,
-      y: crate.y + deltaY * 128,
-      duration: 100,
-      ease: 'Linear',
-      onComplete: () => {
-        this.crates[this.playerData.row + 2 * deltaY][this.playerData.col + 2 * deltaX] = crate;
-        this.crates[this.playerData.row + deltaY][this.playerData.col + deltaX] = null;
-        this.level[this.playerData.row + deltaY][this.playerData.col + deltaX] -= CRATE;
-        this.level[this.playerData.row + 2 * deltaY][this.playerData.col + 2 * deltaX] += CRATE;
-      },
-    });
-  }
-
-  private isLevelSolved() {
-    for (let i = 0; i < this.level.length; i++) {
-      for (let j = 0; j < this.level[i].length; j++) {
-        if (this.level[i][j] === CRATE) {
-          return false;
-        }
+  private moveCrates(): void {
+    this.crates.forEach((sprite, item) => {
+      if (item.prevX !== item.x || item.prevY !== item.y) {
+        this.tweens.add({
+          targets: sprite,
+          x: item.x * SIZE,
+          y: item.y * SIZE,
+          duration: TWEEN_DURATION,
+          ease: 'Linear',
+        });
       }
-    }
-    return true;
+    });
   }
 }

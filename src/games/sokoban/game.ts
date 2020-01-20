@@ -1,5 +1,4 @@
 import 'phaser';
-
 import { GameScene } from './scenes/game-scene';
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -16,7 +15,7 @@ const config: Phaser.Types.Core.GameConfig = {
   },
 };
 
-export class Sokoban extends Phaser.Game {
+export class SokobanGame extends Phaser.Game {
   constructor() {
     super(config);
   }
