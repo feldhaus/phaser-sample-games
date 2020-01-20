@@ -21,7 +21,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   protected preload(): void {
-    this.load.json('level', '/src/games/sokoban/assets/level.json');
+    this.load.json('level', './src/games/sokoban/assets/level.json');
     this.load.spritesheet('tiles', './src/games/sokoban/assets/sokoban.png', {
       frameWidth: SIZE,
       frameHeight: SIZE,
