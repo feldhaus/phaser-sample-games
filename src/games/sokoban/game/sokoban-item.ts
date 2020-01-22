@@ -3,9 +3,9 @@ export class SokobanItem {
   private data: any;
   private positionHistory: Phaser.Math.Vector2[];
 
-  constructor(position: Phaser.Math.Vector2, parent: any) {
+  constructor(row: number, col: number, parent: any) {
     this.parent = parent;
-    this.positionHistory = [position];
+    this.positionHistory = [new Phaser.Math.Vector2(col, row)];
   }
 
   get position(): Phaser.Math.Vector2 {
@@ -21,6 +21,9 @@ export class SokobanItem {
   }
 
   get prevPosition(): Phaser.Math.Vector2 {
+    if (this.positionHistory.length === 1) {
+      return this.position;
+    }
     return this.positionHistory[this.positionHistory.length - 2];
   }
 
@@ -48,7 +51,7 @@ export class SokobanItem {
   }
 
   moveTo(position: Phaser.Math.Vector2): void {
-    this.positionHistory.push(position);
+    this.positionHistory.push(position.clone());
   }
 
   dontMove(): void {

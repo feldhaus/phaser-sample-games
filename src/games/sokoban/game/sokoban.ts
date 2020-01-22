@@ -25,14 +25,11 @@ export class Sokoban {
 
     for (let row = 0; row < this.getLevelRows(); row++) {
       for (let col = 0; col < this.getLevelCols(); col++) {
-        const position = new Phaser.Math.Vector2(col, row);
-
-        if (this.isCrateAt(position)) {
-          this.crates.push(new SokobanItem(position, this));
+        if (this.isCrateAt(row, col)) {
+          this.crates.push(new SokobanItem(row, col, this));
         }
-
-        if (this.isPlayerAt(position)) {
-          this.player = new SokobanItem(position, this);
+        if (this.isPlayerAt(row, col)) {
+          this.player = new SokobanItem(row, col, this);
         }
       }
     }
@@ -94,27 +91,40 @@ export class Sokoban {
     return false;
   }
 
-  getItemAt(position: Phaser.Math.Vector2): number {
-    return this.level[position.y][position.x];
+  getItemAt(row: number, col: number): number;
+  getItemAt(position: Phaser.Math.Vector2): number;
+  getItemAt(arg1: any, arg2?: any): number {
+    if (typeof arg1 === 'number' && typeof arg2 === 'number') {
+      return this.level[arg1][arg2];
+    }
+    return this.level[arg1.y][arg1.x];
   }
 
-  isWalkableAt(position: Phaser.Math.Vector2): boolean {
+  isWalkableAt(row: number, col: number): boolean;
+  isWalkableAt(position: Phaser.Math.Vector2): boolean;
+  isWalkableAt(arg1: any, arg2?: any): boolean {
     return (
-      this.getItemAt(position) === Sokoban.FLOOR ||
-      this.getItemAt(position) === Sokoban.GOAL
+      this.getItemAt(arg1, arg2) === Sokoban.FLOOR ||
+      this.getItemAt(arg1, arg2) === Sokoban.GOAL
     );
   }
 
-  isCrateAt(position: Phaser.Math.Vector2): boolean {
-    return (Sokoban.CRATE & this.getItemAt(position)) === Sokoban.CRATE;
+  isCrateAt(row: number, col: number): boolean;
+  isCrateAt(position: Phaser.Math.Vector2): boolean;
+  isCrateAt(arg1: any, arg2?: any): boolean {
+    return (Sokoban.CRATE & this.getItemAt(arg1, arg2)) === Sokoban.CRATE;
   }
 
-  isPlayerAt(position: Phaser.Math.Vector2): boolean {
-    return (Sokoban.PLAYER & this.getItemAt(position)) === Sokoban.PLAYER;
+  isPlayerAt(row: number, col: number): boolean;
+  isPlayerAt(position: Phaser.Math.Vector2): boolean;
+  isPlayerAt(arg1: any, arg2?: any): boolean {
+    return (Sokoban.PLAYER & this.getItemAt(arg1, arg2)) === Sokoban.PLAYER;
   }
 
-  isGoalAt(position: Phaser.Math.Vector2): boolean {
-    return (Sokoban.GOAL & this.getItemAt(position)) === Sokoban.GOAL;
+  isGoalAt(row: number, col: number): boolean;
+  isGoalAt(position: Phaser.Math.Vector2): boolean;
+  isGoalAt(arg1: any, arg2?: any): boolean {
+    return (Sokoban.GOAL & this.getItemAt(arg1, arg2)) === Sokoban.GOAL;
   }
 
   isPushableCrateAt(
@@ -196,7 +206,6 @@ export class Sokoban {
   undoMove(): boolean {
     if (this.undoArray.length > 0) {
       this.undoLevel = this.undoArray.pop();
-      this.level = [];
       this.level = this.copyArray(this.undoLevel);
       this.moves = this.moves.substring(0, this.moves.length - 1);
       this.player.undoMove();

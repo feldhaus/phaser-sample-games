@@ -66,7 +66,7 @@ export class GameScene extends Phaser.Scene {
           this.add.sprite(position.x, position.y, 'tiles', 89),
         );
 
-        switch (this.sokoban.getItemAt(new Phaser.Math.Vector2(col, row))) {
+        switch (this.sokoban.getItemAt(row, col)) {
           case Sokoban.WALL:
             this.staticAssetsContainer.add(
               this.add.sprite(position.x, position.y, 'tiles', 98),
@@ -102,35 +102,37 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private handlers() {
+  private handlers(): void {
     this.input.keyboard.on('keydown-UP', this.moveUp, this);
     this.input.keyboard.on('keydown-DOWN', this.moveDown, this);
     this.input.keyboard.on('keydown-LEFT', this.moveLeft, this);
     this.input.keyboard.on('keydown-RIGHT', this.moveRight, this);
+    this.input.keyboard.on('keydown-U', this.undoMove, this);
   }
 
-  private moveUp() {
+  private moveUp(): void {
     this.sokoban.moveUp();
     this.handleMovement();
-    this.player.setFrame(68);
   }
 
-  private moveDown() {
+  private moveDown(): void {
     this.sokoban.moveDown();
     this.handleMovement();
-    this.player.setFrame(65);
   }
 
-  private moveLeft() {
+  private moveLeft(): void {
     this.sokoban.moveLeft();
     this.handleMovement();
-    this.player.setFrame(94);
   }
 
-  private moveRight() {
+  private moveRight(): void {
     this.sokoban.moveRight();
     this.handleMovement();
-    this.player.setFrame(91);
+  }
+
+  private undoMove(): void {
+    this.sokoban.undoMove();
+    this.handleMovement();
   }
 
   private handleMovement(): void {
@@ -140,6 +142,21 @@ export class GameScene extends Phaser.Scene {
 
   private movePlayer(): void {
     const player = this.sokoban.getPlayer();
+
+    const direction = player.position.clone();
+    direction.subtract(player.prevPosition);
+    if (direction.equals(Phaser.Math.Vector2.UP)) {
+      this.player.setFrame(68);
+    }
+    if (direction.equals(Phaser.Math.Vector2.DOWN)) {
+      this.player.setFrame(65);
+    }
+    if (direction.equals(Phaser.Math.Vector2.LEFT)) {
+      this.player.setFrame(94);
+    }
+    if (direction.equals(Phaser.Math.Vector2.RIGHT)) {
+      this.player.setFrame(91);
+    }
 
     this.tweens.add({
       targets: this.player,
@@ -161,15 +178,13 @@ export class GameScene extends Phaser.Scene {
 
   private moveCrates(): void {
     this.crates.forEach((sprite, item) => {
-      if (item.prevX !== item.x || item.prevY !== item.y) {
-        this.tweens.add({
-          targets: sprite,
-          x: item.x * SIZE,
-          y: item.y * SIZE,
-          duration: TWEEN_DURATION,
-          ease: 'Linear',
-        });
-      }
+      this.tweens.add({
+        targets: sprite,
+        x: item.x * SIZE,
+        y: item.y * SIZE,
+        duration: TWEEN_DURATION,
+        ease: 'Linear',
+      });
     });
   }
 }
