@@ -1,9 +1,5 @@
 # Phaser Prototypes
 
-<p align="center">
-  <img width=60% src="https://phaser.io/images/img.png">
-</p>
-
 <div align="center">
     
   ![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)

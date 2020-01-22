@@ -5,10 +5,10 @@ const STRING_MOVES = 'UDLR';
 
 export class Sokoban {
   private level: any[];
-  private undoArray: any[];
   private moves: string;
-  private player: any;
-  private crates: any[];
+  private player: SokobanItem;
+  private crates: SokobanItem[];
+  private undoArray: any[];
   private undoLevel: any[];
 
   static readonly FLOOR = 0;
@@ -44,10 +44,6 @@ export class Sokoban {
 
   getCrates(): SokobanItem[] {
     return this.crates;
-  }
-
-  getItemAt(position: Phaser.Math.Vector2): number {
-    return this.level[position.y][position.x];
   }
 
   getLevelRows(): number {
@@ -96,6 +92,10 @@ export class Sokoban {
       return this.doMove(Phaser.Math.Vector2.DOWN);
     }
     return false;
+  }
+
+  getItemAt(position: Phaser.Math.Vector2): number {
+    return this.level[position.y][position.x];
   }
 
   isWalkableAt(position: Phaser.Math.Vector2): boolean {
@@ -166,7 +166,7 @@ export class Sokoban {
       this.player.y + direction.y,
     );
 
-    this.crates.forEach(crate => {
+    this.crates.forEach((crate: SokobanItem) => {
       if (crate.x === step.x && crate.y === step.y) {
         this.moveCrate(
           crate,
@@ -200,7 +200,7 @@ export class Sokoban {
       this.level = this.copyArray(this.undoLevel);
       this.moves = this.moves.substring(0, this.moves.length - 1);
       this.player.undoMove();
-      this.crates.forEach(crate => {
+      this.crates.forEach((crate: SokobanItem) => {
         crate.undoMove();
       });
       return false;

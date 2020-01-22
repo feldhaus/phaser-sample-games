@@ -7,9 +7,8 @@ const TWEEN_DURATION: number = 100;
 
 export class GameScene extends Phaser.Scene {
   private sokoban: Sokoban;
-
-  private staticAssetsGroup: Phaser.GameObjects.Container;
-  private movingAssetsGroup: Phaser.GameObjects.Container;
+  private staticAssetsContainer: Phaser.GameObjects.Container;
+  private movingAssetsContainer: Phaser.GameObjects.Container;
   private player: Phaser.GameObjects.Sprite;
   private crates: Map<SokobanItem, Phaser.GameObjects.Sprite>;
   private currentLevel: number;
@@ -52,30 +51,30 @@ export class GameScene extends Phaser.Scene {
       (height - boardHeight + SIZE) * 0.5,
     );
 
-    this.staticAssetsGroup = this.add.container(0, 0);
-    board.add(this.staticAssetsGroup);
-    this.movingAssetsGroup = this.add.container(0, 0);
-    board.add(this.movingAssetsGroup);
+    this.staticAssetsContainer = this.add.container(0, 0);
+    board.add(this.staticAssetsContainer);
+    this.movingAssetsContainer = this.add.container(0, 0);
+    board.add(this.movingAssetsContainer);
   }
 
   private createLevel(): void {
-    for (let i = 0; i < this.sokoban.getLevelRows(); i++) {
-      for (let j = 0; j < this.sokoban.getLevelCols(); j++) {
-        const position = new Phaser.Math.Vector2(j, i);
+    for (let row = 0; row < this.sokoban.getLevelRows(); row++) {
+      for (let col = 0; col < this.sokoban.getLevelCols(); col++) {
+        const position = new Phaser.Math.Vector2(col * SIZE, row * SIZE);
 
-        this.staticAssetsGroup.add(
-          this.add.sprite(position.x * SIZE, position.y * SIZE, 'tiles', 89),
+        this.staticAssetsContainer.add(
+          this.add.sprite(position.x, position.y, 'tiles', 89),
         );
 
-        switch (this.sokoban.getItemAt(position)) {
+        switch (this.sokoban.getItemAt(new Phaser.Math.Vector2(col, row))) {
           case Sokoban.WALL:
-            this.staticAssetsGroup.add(
-              this.add.sprite(position.x * SIZE, position.y * SIZE, 'tiles', 98),
+            this.staticAssetsContainer.add(
+              this.add.sprite(position.x, position.y, 'tiles', 98),
             );
             break;
           case Sokoban.GOAL:
-            this.staticAssetsGroup.add(
-              this.add.sprite(position.x * SIZE, position.y * SIZE, 'tiles', 13),
+            this.staticAssetsContainer.add(
+              this.add.sprite(position.x, position.y, 'tiles', 13),
             );
             break;
         }
@@ -91,14 +90,14 @@ export class GameScene extends Phaser.Scene {
       'tiles',
       65,
     );
-    this.movingAssetsGroup.add(this.player);
+    this.movingAssetsContainer.add(this.player);
   }
 
   private createCrates(): void {
     this.crates.clear();
     this.sokoban.getCrates().forEach((crate: SokobanItem) => {
       const tile = this.add.sprite(crate.x * SIZE, crate.y * SIZE, 'tiles', 8);
-      this.movingAssetsGroup.add(tile);
+      this.movingAssetsContainer.add(tile);
       this.crates.set(crate, tile);
     });
   }

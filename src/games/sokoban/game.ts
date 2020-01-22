@@ -5,7 +5,7 @@ const config: Phaser.Types.Core.GameConfig = {
   title: 'Sokoban',
   type: Phaser.AUTO,
   scene: [GameScene],
-  backgroundColor: 0x333333,
+  backgroundColor: 0x111111,
   scale: {
     width: 800,
     height: 600,
