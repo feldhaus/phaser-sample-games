@@ -5,9 +5,9 @@ const config: Phaser.Types.Core.GameConfig = {
   title: 'Zhed',
   type: Phaser.AUTO,
   scene: [GameScene],
-  backgroundColor: 0x333333,
+  backgroundColor: 0xdbf1c6,
   scale: {
-    width: 800,
+    width: 400,
     height: 600,
     parent: 'game',
     mode: Phaser.Scale.FIT,

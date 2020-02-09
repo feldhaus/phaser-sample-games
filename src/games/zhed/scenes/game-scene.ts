@@ -1,46 +1,35 @@
 import 'phaser';
-// import { COLOR, int2hex } from '../Color';
+import { Zhed } from '../game/zhed';
 
-export const COLOR = {
-  MAXIMUM_YELLOW_CARD: 0xedae49,
-  DARK_TERRA_COTA: 0xd1495b,
-  METALLIC_SEAWEED: 0x00798c,
-  BDAZZLED_BLUE: 0x30638e,
-  DARK_IMPERIAL_BLUE: 0x003d5b,
+const COLOR = {
+  TILES: 0x173f35,
+  FONT: 0xf5eaea,
 };
 
-export function int2hex(color: number): string {
+const int2hex = (color: number): string => {
   const hex: string = color.toString(16);
   return '#000000'.slice(0, 7 - hex.length) + hex;
-}
+};
 
-const SIZE: number = 60;
+const SIZE: number = 600;
 const STYLE: any = {
   fontSize: '32px',
-  fontFamily: 'Arial',
-  color: int2hex(COLOR.DARK_IMPERIAL_BLUE),
+  fontFamily: '"Lucida Console", Monaco, monospace',
+  color: int2hex(COLOR.FONT),
   align: 'center',
 };
 
 export class GameScene extends Phaser.Scene {
-  private cols: number;
-  private rows: number;
-
-  private tiles: Phaser.GameObjects.Graphics;
-  private steps: Phaser.GameObjects.Graphics;
-
+  private zhed: Zhed;
+  private board: Phaser.GameObjects.Container;
+  private tileSize: number;
+  private background: Phaser.GameObjects.Graphics;
+  private foreground: Phaser.GameObjects.Graphics;
   private currentLevel: number;
-
-  private grid: number[];
-
-  private offset: Phaser.Geom.Point;
-  private selected: Phaser.Geom.Point;
 
   constructor() {
     super({ key: 'Zhed' });
-
-    this.offset = new Phaser.Geom.Point();
-    this.selected = new Phaser.Geom.Point();
+    this.zhed = new Zhed();
   }
 
   protected preload(): void {
@@ -49,172 +38,140 @@ export class GameScene extends Phaser.Scene {
 
   protected create(data: any): void {
     this.currentLevel = data.level || 0;
+    const levels = this.cache.json.get('level');
+    this.zhed.buildLevel(levels[this.currentLevel]);
 
+    this.setupBoard();
     this.createLevel();
 
     this.input.on('pointerup', this.handleTap, this);
+  }
 
-    this.add.text(10, 10, this.currentLevel.toString(), {
-      fontSize: '36px',
-      color: '#ffffff',
-    });
+  private setupBoard(): void {
+    const { width, height } = this.sys.game.canvas;
+    this.tileSize = width / this.zhed.getLevelCols();
+    const boardWidth = this.tileSize * this.zhed.getLevelCols();
+    const boardHeight = this.tileSize * this.zhed.getLevelRows();
+
+    this.board = this.add.container(
+      (width - boardWidth) * 0.5,
+      (height - boardHeight) * 0.5,
+    );
+
+    this.background = this.add.graphics();
+    this.board.add(this.background);
+
+    this.foreground = this.add.graphics();
+    this.board.add(this.foreground);
   }
 
   private createLevel(): void {
-    const levels = this.cache.json.get('level');
-    const level = levels[this.currentLevel];
+    this.drawBackground();
+    this.drawForeground();
+  }
 
-    this.grid = [];
+  private handleTap(pointer: Phaser.Input.Pointer): void {
+    const col = Math.floor((pointer.x - this.board.x) / this.tileSize);
+    const row = Math.floor((pointer.y - this.board.y) / this.tileSize);
+    this.zhed.doMove(row, col);
+    this.drawForeground();
 
-    this.rows = level.length;
-    this.cols = level[0].length;
+    if (this.zhed.isLevelSolved()) {
+      // this.input.keyboard.removeAllListeners();
+      setTimeout(() => {
+        this.scene.restart({ level: this.currentLevel + 1 });
+      // tslint:disable-next-line: align
+      }, 1000);
+    }
+  }
 
-    this.offset.x = (this.sys.canvas.width - this.cols * SIZE) / 2;
-    this.offset.y = (this.sys.canvas.height - this.rows * SIZE) / 2;
-
-    this.tiles = this.add.graphics();
-    this.steps = this.add.graphics();
-
-    for (let row = 0; row < level.length; row++) {
-      for (let col = 0; col < level[row].length; col++) {
-        const px: number = this.offset.x + col * SIZE;
-        const py: number = this.offset.y + row * SIZE;
-
-        const value = level[row][col];
-        this.grid.push(value);
-
-        if (value > 0 && value < 10) {
-          this.tiles.fillStyle(COLOR.MAXIMUM_YELLOW_CARD, 1);
-          this.tiles.fillRect(px, py, SIZE, SIZE);
-          const txt: Phaser.GameObjects.Text = this.add.text(
-            0,
-            0,
-            value.toFixed(),
-            STYLE,
-          );
-          txt.x = px + (SIZE - txt.width) / 2;
-          txt.y = py + (SIZE - txt.height) / 2;
-        } else if (value === 10) {
-          this.tiles.fillStyle(COLOR.BDAZZLED_BLUE, 1);
-          this.tiles.fillRect(px, py, SIZE, SIZE);
-          this.tiles.lineStyle(5, COLOR.DARK_TERRA_COTA, 1);
-          this.tiles.strokeCircle(px + SIZE / 2, py + SIZE / 2, 20);
-        } else {
-          this.tiles.fillStyle(COLOR.METALLIC_SEAWEED, 1);
-          this.tiles.fillRect(px, py, SIZE, SIZE);
-        }
-
-        this.tiles.lineStyle(2, COLOR.DARK_IMPERIAL_BLUE, 1);
-        this.tiles.strokeRect(px, py, SIZE, SIZE);
-
-        this.add.text(px + 1, py + 1, `${col},${row}`, {
-          fontSize: '12px',
-          color: int2hex(COLOR.DARK_IMPERIAL_BLUE),
-        });
+  private drawBackground(): void {
+    for (let row = 0; row < this.zhed.getLevelRows(); row++) {
+      for (let col = 0; col < this.zhed.getLevelCols(); col++) {
+        this.background.fillStyle(COLOR.TILES, 0.1 + Math.random() * 0.3);
+        this.background.fillRect(
+          col * this.tileSize,
+          row * this.tileSize,
+          this.tileSize,
+          this.tileSize,
+        );
       }
     }
   }
 
-  private handleTap(pointer: Phaser.Input.Pointer): void {
-    const tapCol = Math.floor((pointer.x - this.offset.x) / SIZE);
-    const tapRow = Math.floor((pointer.y - this.offset.y) / SIZE);
+  private drawForeground(): void {
+    // clear graphics
+    this.foreground.clear();
 
-    if (!this.isInside(tapCol, tapRow)) return;
+    // remove all tile texts
+    this.board.getAll().forEach((go) => {
+      if (go instanceof Phaser.GameObjects.Text) { go.destroy(); }
+    });
 
-    this.steps.clear();
+    for (let row = 0; row < this.zhed.getLevelRows(); row++) {
+      for (let col = 0; col < this.zhed.getLevelCols(); col++) {
+        const position = new Phaser.Math.Vector2(
+          col * this.tileSize,
+          row * this.tileSize,
+        );
 
-    const tileValue = this.getValue(tapCol, tapRow);
+        const value = this.zhed.getItemAt(row, col);
 
-    if (tileValue < 0) {
-      this.setValue(this.selected.x, this.selected.y, -1);
-
-      const deltaX = Phaser.Math.Clamp(tapCol - this.selected.x, -1, 1);
-      const deltaY = Phaser.Math.Clamp(tapRow - this.selected.y, -1, 1);
-
-      this.showMovement(this.selected.x, this.selected.y, deltaX, deltaY);
-    }
-
-    this.grid = this.grid.map(v => (v === -1 ? 0 : v === -2 ? 10 : v));
-
-    if (tileValue > 0 && tileValue < 10) {
-      this.showSteps(tapCol, tapRow, tileValue, 0, 1);
-      this.showSteps(tapCol, tapRow, tileValue, 0, -1);
-      this.showSteps(tapCol, tapRow, tileValue, 1, 0);
-      this.showSteps(tapCol, tapRow, tileValue, -1, 0);
-      this.selected.setTo(tapCol, tapRow);
-    }
-
-    if (tileValue === -2 && this.getValue(tapCol, tapRow) === 11) {
-      setTimeout(() => {
-        this.scene.restart({ level: this.currentLevel + 1 });
-      },         1000);
+        switch (value) {
+          case Zhed.GOAL:
+            this.drawTile(0xffffff, position, '✕');
+            break;
+          case Zhed.STEP:
+            this.drawStep(COLOR.TILES, position);
+            break;
+          case Zhed.EMPTY:
+            break;
+          case Zhed.PATH:
+            this.drawTile(COLOR.TILES, position);
+            break;
+          default:
+            this.drawTile(COLOR.TILES, position, value.toFixed());
+        }
+      }
     }
   }
 
-  private showSteps(
-    col: number,
-    row: number,
-    steps: number,
-    deltaCol: number,
-    deltaRow: number,
+  private drawTile(
+    color: number,
+    position: Phaser.Math.Vector2,
+    label?: string,
   ): void {
-    if (steps === 0) return;
+    this.foreground.fillStyle(0x111111);
+    this.foreground.fillRoundedRect(
+      position.x,
+      position.y,
+      this.tileSize,
+      this.tileSize,
+      5,
+    );
+    this.foreground.fillStyle(color);
+    this.foreground.fillRoundedRect(
+      position.x,
+      position.y,
+      this.tileSize,
+      this.tileSize - 5,
+      5,
+    );
 
-    const stepCol: number = col + deltaCol;
-    const stepRow: number = row + deltaRow;
+    if (!label) return;
 
-    if (!this.isInside(stepCol, stepRow)) return;
-
-    const tileValue = this.getValue(stepCol, stepRow);
-
-    if (tileValue === 0 || tileValue === 10) {
-      this.drawStep(stepCol, stepRow);
-      this.showSteps(stepCol, stepRow, steps - 1, deltaCol, deltaRow);
-      this.setValue(stepCol, stepRow, tileValue === 10 ? -2 : -1);
-    } else {
-      this.showSteps(stepCol, stepRow, steps, deltaCol, deltaRow);
-    }
+    const text = this.add.text(0, 0, label, STYLE);
+    text.x = position.x + (this.tileSize - text.width) * 0.5;
+    text.y = position.y + (this.tileSize - text.height) * 0.5 - 2.5;
+    this.board.add(text);
   }
 
-  private showMovement(
-    col: number,
-    row: number,
-    deltaCol: number,
-    deltaRow: number,
-  ): void {
-    if (!this.isInside(col, row)) return;
-
-    const tileValue = this.getValue(col, row);
-
-    if (tileValue < 0) {
-      const px: number = this.offset.x + col * SIZE;
-      const py: number = this.offset.y + row * SIZE;
-      this.tiles.fillStyle(COLOR.DARK_TERRA_COTA, 1);
-      this.tiles.fillRect(px, py, SIZE, SIZE);
-      this.tiles.lineStyle(2, 0x254441, 1);
-      this.tiles.strokeRect(px, py, SIZE, SIZE);
-      this.setValue(col, row, 11);
-    }
-
-    this.showMovement(col + deltaCol, row + deltaRow, deltaCol, deltaRow);
-  }
-
-  private setValue(col: number, row: number, value: number): void {
-    this.grid[row * this.cols + col] = value;
-  }
-
-  private getValue(col: number, row: number): number {
-    return this.grid[row * this.cols + col];
-  }
-
-  private isInside(col: number, row: number): boolean {
-    return row >= 0 && col >= 0 && row < this.rows && col < this.cols;
-  }
-
-  private drawStep(col: number, row: number): void {
-    const px: number = this.offset.x + col * SIZE;
-    const py: number = this.offset.y + row * SIZE;
-    this.steps.fillStyle(COLOR.MAXIMUM_YELLOW_CARD, 0.7);
-    this.steps.fillCircle(px + SIZE / 2, py + SIZE / 2, 6);
+  private drawStep(color: number, position: Phaser.Math.Vector2): void {
+    this.foreground.fillStyle(color);
+    this.foreground.fillCircle(
+      position.x + this.tileSize * 0.5,
+      position.y + this.tileSize * 0.5,
+      5,
+    );
   }
 }
