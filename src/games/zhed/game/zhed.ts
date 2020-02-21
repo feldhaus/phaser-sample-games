@@ -1,19 +1,20 @@
 import 'phaser';
+import { TileVector } from '../../../math/TileVector';
 
 export class Zhed {
   private level: number[][];
   private undoArray: number[][][];
-  private selected: Phaser.Math.Vector2;
+  private selected: TileVector;
 
   static readonly EMPTY = 0;
-  static readonly STEP = -1;
   static readonly GOAL = 10;
-  static readonly PATH = 11;
+  static readonly STEP = 11;
+  static readonly PATH = 12;
+  static readonly LAST = 13;
 
   buildLevel(level: number[][]): void {
     this.level = level.concat();
     this.undoArray = [];
-    this.selected = new Phaser.Math.Vector2(-1, -1);
   }
 
   getLevelRows(): number {
@@ -30,13 +31,8 @@ export class Zhed {
       .some(value => value === Zhed.GOAL || value === Zhed.STEP);
   }
 
-  getItemAt(row: number, col: number): number;
-  getItemAt(position: Phaser.Math.Vector2): number;
-  getItemAt(arg1: any, arg2?: any): number {
-    if (typeof arg1 === 'number' && typeof arg2 === 'number') {
-      return this.level[arg1][arg2];
-    }
-    return this.level[arg1.y][arg1.x];
+  isSelected(): boolean {
+    return typeof this.selected !== 'undefined';
   }
 
   isInside(row: number, col: number): boolean {
@@ -48,17 +44,26 @@ export class Zhed {
     );
   }
 
+  getItemAt(row: number, col: number): number;
+  getItemAt(position: TileVector): number;
+  getItemAt(arg1: any, arg2?: any): number {
+    if (typeof arg1 === 'number' && typeof arg2 === 'number') {
+      return this.level[arg1][arg2];
+    }
+    return this.level[arg1.row][arg1.col];
+  }
+
   doMove(row: number, col: number): boolean {
     if (!this.isInside(row, col)) return false;
 
     const value = this.getItemAt(row, col);
 
     if (value > 0 && value < 10) {
-      if (this.selected.x !== -1 && this.selected.y !== -1) {
+      if (this.isSelected()) {
         this.undoMove();
       }
       this.doSelect(row, col);
-    } else if (value === Zhed.STEP) {
+    } else if (value === Zhed.STEP || value === Zhed.LAST) {
       this.doBuild(row, col);
     } else if (value === Zhed.PATH) {
     } else {
@@ -76,55 +81,56 @@ export class Zhed {
   private doSelect(row: number, col: number): void {
     this.pushHistory();
 
-    this.selected.set(col, row);
+    this.selected = new TileVector(row, col);
     const steps = this.getItemAt(this.selected);
 
-    this.updateValues(this.selected, Phaser.Math.Vector2.UP, steps, Zhed.STEP);
-    // prettier-ignore
-    this.updateValues(this.selected, Phaser.Math.Vector2.DOWN, steps, Zhed.STEP);
-    // prettier-ignore
-    this.updateValues(this.selected, Phaser.Math.Vector2.LEFT, steps, Zhed.STEP);
-    // prettier-ignore
-    this.updateValues(this.selected, Phaser.Math.Vector2.RIGHT, steps, Zhed.STEP);
+    this.updateValues(this.selected, TileVector.UP, steps, Zhed.STEP);
+    this.updateValues(this.selected, TileVector.DOWN, steps, Zhed.STEP);
+    this.updateValues(this.selected, TileVector.LEFT, steps, Zhed.STEP);
+    this.updateValues(this.selected, TileVector.RIGHT, steps, Zhed.STEP);
   }
 
   private doBuild(row: number, col: number): void {
     this.popHistory();
     this.pushHistory();
 
-    const direction = new Phaser.Math.Vector2(
-      col - this.selected.x,
-      row - this.selected.y,
+    const direction = new TileVector(
+      row - this.selected.row,
+      col - this.selected.col,
     );
     direction.normalize();
 
     const steps = this.getItemAt(this.selected);
 
-    this.level[this.selected.y][this.selected.x] = Zhed.PATH;
+    this.level[this.selected.row][this.selected.col] = Zhed.PATH;
     this.updateValues(this.selected, direction, steps, Zhed.PATH);
 
-    this.selected.set(-1, -1);
+    this.selected = undefined;
   }
 
   private updateValues(
-    position: Phaser.Math.Vector2,
-    direction: Phaser.Math.Vector2,
+    position: TileVector,
+    direction: TileVector,
     steps: number,
     newValue: number,
   ): void {
     if (steps === 0) return;
 
-    const nextPosition = new Phaser.Math.Vector2(
-      position.x + direction.x,
-      position.y + direction.y,
+    const nextPosition = new TileVector(
+      position.row + direction.row,
+      position.col + direction.col,
     );
 
-    if (!this.isInside(nextPosition.y, nextPosition.x)) return;
+    if (!this.isInside(nextPosition.row, nextPosition.col)) return;
 
     const value = this.getItemAt(nextPosition);
 
     if (value === 0 || value === 10) {
-      this.level[nextPosition.y][nextPosition.x] = newValue;
+      if (newValue === Zhed.STEP && value === 10) {
+        this.level[nextPosition.row][nextPosition.col] = Zhed.LAST;
+      } else {
+        this.level[nextPosition.row][nextPosition.col] = newValue;
+      }
       this.updateValues(nextPosition, direction, steps - 1, newValue);
     } else {
       this.updateValues(nextPosition, direction, steps, newValue);

@@ -11,11 +11,10 @@ const int2hex = (color: number): string => {
   return '#000000'.slice(0, 7 - hex.length) + hex;
 };
 
-const SIZE: number = 600;
 const STYLE: any = {
   fontSize: '32px',
   fontFamily: '"Lucida Console", Monaco, monospace',
-  color: int2hex(COLOR.FONT),
+  fill: int2hex(COLOR.FONT),
   align: 'center',
 };
 
@@ -77,10 +76,10 @@ export class GameScene extends Phaser.Scene {
     this.drawForeground();
 
     if (this.zhed.isLevelSolved()) {
-      // this.input.keyboard.removeAllListeners();
+      this.input.removeAllListeners();
       setTimeout(() => {
         this.scene.restart({ level: this.currentLevel + 1 });
-      // tslint:disable-next-line: align
+        // tslint:disable-next-line: align
       }, 1000);
     }
   }
@@ -105,7 +104,9 @@ export class GameScene extends Phaser.Scene {
 
     // remove all tile texts
     this.board.getAll().forEach((go) => {
-      if (go instanceof Phaser.GameObjects.Text) { go.destroy(); }
+      if (go instanceof Phaser.GameObjects.Text) {
+        go.destroy();
+      }
     });
 
     for (let row = 0; row < this.zhed.getLevelRows(); row++) {
@@ -123,6 +124,9 @@ export class GameScene extends Phaser.Scene {
             break;
           case Zhed.STEP:
             this.drawStep(COLOR.TILES, position);
+            break;
+          case Zhed.LAST:
+            this.drawTile(COLOR.TILES, position, '✕');
             break;
           case Zhed.EMPTY:
             break;
