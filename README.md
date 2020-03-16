@@ -1,4 +1,4 @@
-# Phaser Prototypes
+# Phaser Sample Games
 
 <div align="center">
     
@@ -15,7 +15,7 @@
   </sub>
 </p>
 
-Here you will find some develop games with Phaser3 in TypeScript. 
+Here you will find some games developed with Phaser3 in TypeScript. 
 Ideas and corrections are highly desirable to constantly improve this repository!
 
 ## Getting started
@@ -49,7 +49,7 @@ Perform a quick build (bundle.js) and start server:
 npm run dev
 ```
 
-## Game Examples
+## Sample Games
 
 [Sokoban](src/games/sokoban)
 
