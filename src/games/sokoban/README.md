@@ -1,6 +1,6 @@
 # Sokoban
 Sokoban is a classic puzzle game invented by Hiroyuki Imabayashi. The name comes from Japan and means "warehouse keeper".\
-[[Play]](https://feldhaus.github.io/phaser-prototypes/?&game=sokoban)
+[[Play]](https://feldhaus.github.io/phaser-sample-games/?&game=sokoban)
 
 ## Rules
 The game is played on a board of squares, where each square is a floor or a wall. Some floor squares contain boxes, and some floor squares are marked as storage locations.
