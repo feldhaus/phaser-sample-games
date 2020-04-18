@@ -1,4 +1,3 @@
-import 'phaser';
 import { TileVector } from '../../../math/TileVector';
 
 export class Zhed {
@@ -6,11 +5,11 @@ export class Zhed {
   private undoArray: number[][][];
   private selected: TileVector;
 
-  static readonly EMPTY = 0;
-  static readonly GOAL = 10;
-  static readonly STEP = 11;
-  static readonly PATH = 12;
-  static readonly LAST = 13;
+  static readonly EMPTY: number = 0;
+  static readonly GOAL: number = 10;
+  static readonly STEP: number = 11;
+  static readonly PATH: number = 12;
+  static readonly LAST: number = 13;
 
   buildLevel(level: number[][]): void {
     this.level = level.concat();
@@ -94,10 +93,8 @@ export class Zhed {
     this.popHistory();
     this.pushHistory();
 
-    const direction = new TileVector(
-      row - this.selected.row,
-      col - this.selected.col,
-    );
+    const direction = new TileVector(row, col);
+    direction.sub(this.selected);
     direction.normalize();
 
     const steps = this.getItemAt(this.selected);
@@ -116,10 +113,7 @@ export class Zhed {
   ): void {
     if (steps === 0) return;
 
-    const nextPosition = new TileVector(
-      position.row + direction.row,
-      position.col + direction.col,
-    );
+    const nextPosition = TileVector.add(position, direction);
 
     if (!this.isInside(nextPosition.row, nextPosition.col)) return;
 
