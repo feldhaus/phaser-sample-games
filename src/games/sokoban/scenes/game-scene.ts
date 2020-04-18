@@ -1,6 +1,7 @@
 import 'phaser';
 import { Sokoban } from '../game/sokoban';
 import { SokobanItem } from '../game/sokoban-item';
+import { TileVector } from '../../../math/TileVector';
 
 const SIZE: number = 128;
 const TWEEN_DURATION: number = 100;
@@ -85,8 +86,8 @@ export class GameScene extends Phaser.Scene {
   private createPlayer(): void {
     const player = this.sokoban.getPlayer();
     this.player = this.add.sprite(
-      player.x * SIZE,
-      player.y * SIZE,
+      player.col * SIZE,
+      player.row * SIZE,
       'tiles',
       65,
     );
@@ -96,7 +97,12 @@ export class GameScene extends Phaser.Scene {
   private createCrates(): void {
     this.crates.clear();
     this.sokoban.getCrates().forEach((crate: SokobanItem) => {
-      const tile = this.add.sprite(crate.x * SIZE, crate.y * SIZE, 'tiles', 8);
+      const tile = this.add.sprite(
+        crate.col * SIZE,
+        crate.row * SIZE,
+        'tiles',
+        8,
+      );
       this.movingAssetsContainer.add(tile);
       this.crates.set(crate, tile);
     });
@@ -144,24 +150,24 @@ export class GameScene extends Phaser.Scene {
     const player = this.sokoban.getPlayer();
 
     const direction = player.position.clone();
-    direction.subtract(player.prevPosition);
-    if (direction.equals(Phaser.Math.Vector2.UP)) {
+    direction.sub(player.prevPosition);
+    if (direction.equals(TileVector.UP)) {
       this.player.setFrame(68);
     }
-    if (direction.equals(Phaser.Math.Vector2.DOWN)) {
+    if (direction.equals(TileVector.DOWN)) {
       this.player.setFrame(65);
     }
-    if (direction.equals(Phaser.Math.Vector2.LEFT)) {
+    if (direction.equals(TileVector.LEFT)) {
       this.player.setFrame(94);
     }
-    if (direction.equals(Phaser.Math.Vector2.RIGHT)) {
+    if (direction.equals(TileVector.RIGHT)) {
       this.player.setFrame(91);
     }
 
     this.tweens.add({
       targets: this.player,
-      x: player.x * SIZE,
-      y: player.y * SIZE,
+      x: player.col * SIZE,
+      y: player.row * SIZE,
       duration: TWEEN_DURATION,
       ease: 'Linear',
       onComplete: () => {
@@ -169,7 +175,7 @@ export class GameScene extends Phaser.Scene {
           this.input.keyboard.removeAllListeners();
           setTimeout(() => {
             this.scene.restart({ level: this.currentLevel + 1 });
-          // tslint:disable-next-line: align
+            // tslint:disable-next-line: align
           }, 1000);
         }
       },
@@ -180,8 +186,8 @@ export class GameScene extends Phaser.Scene {
     this.crates.forEach((sprite, item) => {
       this.tweens.add({
         targets: sprite,
-        x: item.x * SIZE,
-        y: item.y * SIZE,
+        x: item.col * SIZE,
+        y: item.row * SIZE,
         duration: TWEEN_DURATION,
         ease: 'Linear',
       });

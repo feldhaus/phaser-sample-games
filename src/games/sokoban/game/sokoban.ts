@@ -1,5 +1,5 @@
-import 'phaser';
 import { SokobanItem } from './sokoban-item';
+import { TileVector } from '../../../math/TileVector';
 
 const STRING_MOVES = 'UDLR';
 
@@ -67,48 +67,41 @@ export class Sokoban {
   }
 
   moveLeft(): boolean {
-    if (this.canMove(Phaser.Math.Vector2.LEFT)) {
-      return this.doMove(Phaser.Math.Vector2.LEFT);
+    if (this.canMove(TileVector.LEFT)) {
+      return this.doMove(TileVector.LEFT);
     }
     return false;
   }
 
   moveRight(): boolean {
-    if (this.canMove(Phaser.Math.Vector2.RIGHT)) {
-      return this.doMove(Phaser.Math.Vector2.RIGHT);
+    if (this.canMove(TileVector.RIGHT)) {
+      return this.doMove(TileVector.RIGHT);
     }
     return false;
   }
 
   moveUp(): boolean {
-    if (this.canMove(Phaser.Math.Vector2.UP)) {
-      return this.doMove(Phaser.Math.Vector2.UP);
+    if (this.canMove(TileVector.UP)) {
+      return this.doMove(TileVector.UP);
     }
     return false;
   }
 
   moveDown(): boolean {
-    if (this.canMove(Phaser.Math.Vector2.DOWN)) {
-      return this.doMove(Phaser.Math.Vector2.DOWN);
+    if (this.canMove(TileVector.DOWN)) {
+      return this.doMove(TileVector.DOWN);
     }
     return false;
   }
 
-  doMove(direction: Phaser.Math.Vector2): boolean {
+  doMove(direction: TileVector): boolean {
     this.pushHistory();
 
-    const step = new Phaser.Math.Vector2(
-      this.player.x + direction.x,
-      this.player.y + direction.y,
-    );
+    const step = TileVector.add(this.player.position, direction);
 
     this.crates.forEach((crate: SokobanItem) => {
-      if (crate.x === step.x && crate.y === step.y) {
-        this.moveCrate(
-          crate,
-          step,
-          new Phaser.Math.Vector2(step.x + direction.x, step.y + direction.y),
-        );
+      if (crate.position.equals(step)) {
+        this.moveCrate(crate, step, TileVector.add(step, direction));
       } else {
         crate.dontMove();
       }
@@ -117,11 +110,11 @@ export class Sokoban {
     this.movePlayer(this.player.position, step);
 
     this.moves += STRING_MOVES.charAt(
-      direction.y === 0
-        ? direction.x === 1
+      direction.row === 0
+        ? direction.col === 1
           ? 3
           : 2
-        : direction.y === 1
+        : direction.row === 1
         ? 1
         : 0,
     );
@@ -147,16 +140,16 @@ export class Sokoban {
   }
 
   getItemAt(row: number, col: number): number;
-  getItemAt(position: Phaser.Math.Vector2): number;
+  getItemAt(position: TileVector): number;
   getItemAt(arg1: any, arg2?: any): number {
     if (typeof arg1 === 'number' && typeof arg2 === 'number') {
       return this.level[arg1][arg2];
     }
-    return this.level[arg1.y][arg1.x];
+    return this.level[arg1.row][arg1.col];
   }
 
   private isWalkableAt(row: number, col: number): boolean;
-  private isWalkableAt(position: Phaser.Math.Vector2): boolean;
+  private isWalkableAt(position: TileVector): boolean;
   private isWalkableAt(arg1: any, arg2?: any): boolean {
     return (
       this.getItemAt(arg1, arg2) === Sokoban.FLOOR ||
@@ -165,39 +158,33 @@ export class Sokoban {
   }
 
   private isCrateAt(row: number, col: number): boolean;
-  private isCrateAt(position: Phaser.Math.Vector2): boolean;
+  private isCrateAt(position: TileVector): boolean;
   private isCrateAt(arg1: any, arg2?: any): boolean {
     return (Sokoban.CRATE & this.getItemAt(arg1, arg2)) === Sokoban.CRATE;
   }
 
   private isPlayerAt(row: number, col: number): boolean;
-  private isPlayerAt(position: Phaser.Math.Vector2): boolean;
+  private isPlayerAt(position: TileVector): boolean;
   private isPlayerAt(arg1: any, arg2?: any): boolean {
     return (Sokoban.PLAYER & this.getItemAt(arg1, arg2)) === Sokoban.PLAYER;
   }
 
   private isGoalAt(row: number, col: number): boolean;
-  private isGoalAt(position: Phaser.Math.Vector2): boolean;
+  private isGoalAt(position: TileVector): boolean;
   private isGoalAt(arg1: any, arg2?: any): boolean {
     return (Sokoban.GOAL & this.getItemAt(arg1, arg2)) === Sokoban.GOAL;
   }
 
   private isPushableCrateAt(
-    position: Phaser.Math.Vector2,
-    direction: Phaser.Math.Vector2,
+    position: TileVector,
+    direction: TileVector,
   ): boolean {
-    const movedCrate = new Phaser.Math.Vector2(
-      position.x + direction.x,
-      position.y + direction.y,
-    );
+    const movedCrate = TileVector.add(position, direction);
     return this.isCrateAt(position) && this.isWalkableAt(movedCrate);
   }
 
-  private canMove(direction: Phaser.Math.Vector2): boolean {
-    const movedPlayer = new Phaser.Math.Vector2(
-      this.player.x + direction.x,
-      this.player.y + direction.y,
-    );
+  private canMove(direction: TileVector): boolean {
+    const movedPlayer = TileVector.add(this.player.position, direction);
     return (
       this.isWalkableAt(movedPlayer) ||
       this.isPushableCrateAt(movedPlayer, direction)
@@ -206,21 +193,18 @@ export class Sokoban {
 
   private moveCrate(
     crate: SokobanItem,
-    fromPosition: Phaser.Math.Vector2,
-    toPosition: Phaser.Math.Vector2,
+    fromPosition: TileVector,
+    toPosition: TileVector,
   ): void {
     crate.moveTo(toPosition);
-    this.level[fromPosition.y][fromPosition.x] -= Sokoban.CRATE;
-    this.level[toPosition.y][toPosition.x] += Sokoban.CRATE;
+    this.level[fromPosition.row][fromPosition.col] -= Sokoban.CRATE;
+    this.level[toPosition.row][toPosition.col] += Sokoban.CRATE;
   }
 
-  private movePlayer(
-    fromPosition: Phaser.Math.Vector2,
-    toPosition: Phaser.Math.Vector2,
-  ): void {
+  private movePlayer(fromPosition: TileVector, toPosition: TileVector): void {
     this.player.moveTo(toPosition);
-    this.level[fromPosition.y][fromPosition.x] -= Sokoban.PLAYER;
-    this.level[toPosition.y][toPosition.x] += Sokoban.PLAYER;
+    this.level[fromPosition.row][fromPosition.col] -= Sokoban.PLAYER;
+    this.level[toPosition.row][toPosition.col] += Sokoban.PLAYER;
   }
 
   private pushHistory(): void {

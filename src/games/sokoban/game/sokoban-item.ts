@@ -1,45 +1,47 @@
+import { TileVector } from '../../../math/TileVector';
+
 export class SokobanItem {
-  private positionHistory: Phaser.Math.Vector2[];
+  private positionHistory: TileVector[];
 
   constructor(row: number, col: number) {
-    this.positionHistory = [new Phaser.Math.Vector2(col, row)];
+    this.positionHistory = [new TileVector(row, col)];
   }
 
-  get position(): Phaser.Math.Vector2 {
+  get position(): TileVector {
     return this.positionHistory[this.positionHistory.length - 1];
   }
 
-  get x(): number {
-    return this.position.x;
+  get col(): number {
+    return this.position.col;
   }
 
-  get y(): number {
-    return this.position.y;
+  get row(): number {
+    return this.position.row;
   }
 
-  get prevPosition(): Phaser.Math.Vector2 {
+  get prevPosition(): TileVector {
     if (this.positionHistory.length === 1) {
       return this.position;
     }
     return this.positionHistory[this.positionHistory.length - 2];
   }
 
-  get prevX(): number {
-    return this.prevPosition.x;
+  get prevCol(): number {
+    return this.prevPosition.col;
   }
 
-  get prevY(): number {
-    return this.prevPosition.y;
+  get prevRow(): number {
+    return this.prevPosition.row;
   }
 
   hasMoved(): boolean {
     return (
       this.positionHistory.length > 1 &&
-      (this.x !== this.prevX || this.y !== this.prevY)
+      (this.col !== this.prevCol || this.row !== this.prevRow)
     );
   }
 
-  moveTo(position: Phaser.Math.Vector2): void {
+  moveTo(position: TileVector): void {
     this.positionHistory.push(position.clone());
   }
 
