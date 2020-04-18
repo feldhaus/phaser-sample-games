@@ -12,7 +12,7 @@ export class Zhed {
   static readonly LAST: number = 13;
 
   buildLevel(level: number[][]): void {
-    this.level = level.concat();
+    this.level = this.copyArray(level);
     this.undoArray = [];
   }
 

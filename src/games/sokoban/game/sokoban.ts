@@ -19,7 +19,7 @@ export class Sokoban {
   static readonly CRATE: number = 8;
 
   buildLevel(level: number[][]): void {
-    this.level = level.concat();
+    this.level = this.copyArray(level);
     this.rows = this.level.length;
     this.cols = this.level[0].length;
     this.undoArray = [];
