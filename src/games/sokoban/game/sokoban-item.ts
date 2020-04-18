@@ -1,10 +1,7 @@
 export class SokobanItem {
-  private parent: any;
-  private data: any;
   private positionHistory: Phaser.Math.Vector2[];
 
-  constructor(row: number, col: number, parent: any) {
-    this.parent = parent;
+  constructor(row: number, col: number) {
     this.positionHistory = [new Phaser.Math.Vector2(col, row)];
   }
 
@@ -42,14 +39,6 @@ export class SokobanItem {
     );
   }
 
-  setData(data: any): void {
-    this.data = data;
-  }
-
-  getData(): any {
-    return this.data;
-  }
-
   moveTo(position: Phaser.Math.Vector2): void {
     this.positionHistory.push(position.clone());
   }
@@ -60,9 +49,5 @@ export class SokobanItem {
 
   undoMove(): void {
     this.positionHistory.pop();
-  }
-
-  isOnGoal() {
-    return this.parent.isGoalAt(this.position.clone());
   }
 }

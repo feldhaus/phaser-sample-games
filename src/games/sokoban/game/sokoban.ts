@@ -5,19 +5,23 @@ const STRING_MOVES = 'UDLR';
 
 export class Sokoban {
   private level: number[][];
+  private rows: number;
+  private cols: number;
   private undoArray: number[][][];
   private moves: string;
   private player: SokobanItem;
   private crates: SokobanItem[];
 
-  static readonly FLOOR = 0;
-  static readonly WALL = 1;
-  static readonly PLAYER = 2;
-  static readonly GOAL = 4;
-  static readonly CRATE = 8;
+  static readonly FLOOR: number = 0;
+  static readonly WALL: number = 1;
+  static readonly PLAYER: number = 2;
+  static readonly GOAL: number = 4;
+  static readonly CRATE: number = 8;
 
   buildLevel(level: number[][]): void {
     this.level = level.concat();
+    this.rows = this.level.length;
+    this.cols = this.level[0].length;
     this.undoArray = [];
     this.moves = '';
     this.crates = [];
@@ -25,10 +29,10 @@ export class Sokoban {
     for (let row = 0; row < this.getLevelRows(); row++) {
       for (let col = 0; col < this.getLevelCols(); col++) {
         if (this.isCrateAt(row, col)) {
-          this.crates.push(new SokobanItem(row, col, this));
+          this.crates.push(new SokobanItem(row, col));
         }
         if (this.isPlayerAt(row, col)) {
-          this.player = new SokobanItem(row, col, this);
+          this.player = new SokobanItem(row, col);
         }
       }
     }
@@ -43,11 +47,11 @@ export class Sokoban {
   }
 
   getLevelRows(): number {
-    return this.level.length;
+    return this.rows;
   }
 
   getLevelCols(): number {
-    return this.level[0].length;
+    return this.cols;
   }
 
   countCrates(): number {
@@ -55,7 +59,7 @@ export class Sokoban {
   }
 
   countCratesOnGoal(): number {
-    return this.crates.filter(crate => crate.isOnGoal()).length;
+    return this.crates.filter(crate => this.isGoalAt(crate.position)).length;
   }
 
   isLevelSolved(): boolean {
@@ -133,8 +137,9 @@ export class Sokoban {
       this.crates.forEach((crate: SokobanItem) => {
         crate.undoMove();
       });
-      return false;
+      return true;
     }
+    return false;
   }
 
   getMoves(): string {
