@@ -5,36 +5,36 @@ export class Zhed {
   private undoArray: number[][][];
   private selected: Vector2;
 
-  static readonly EMPTY: number = 0;
-  static readonly GOAL: number = 10;
-  static readonly STEP: number = 11;
-  static readonly PATH: number = 12;
-  static readonly LAST: number = 13;
+  public static readonly EMPTY: number = 0;
+  public static readonly GOAL: number = 10;
+  public static readonly STEP: number = 11;
+  public static readonly PATH: number = 12;
+  public static readonly LAST: number = 13;
 
-  buildLevel(level: number[][]): void {
+  public buildLevel(level: number[][]): void {
     this.level = this.copyArray(level);
     this.undoArray = [];
   }
 
-  getLevelRows(): number {
+  public getLevelRows(): number {
     return this.level.length;
   }
 
-  getLevelCols(): number {
+  public getLevelCols(): number {
     return this.level[0].length;
   }
 
-  isLevelSolved(): boolean {
+  public isLevelSolved(): boolean {
     return !this.level
       .reduce((acc, val) => acc.concat(val), [])
       .some(value => value === Zhed.GOAL || value === Zhed.STEP);
   }
 
-  isSelected(): boolean {
+  public isSelected(): boolean {
     return typeof this.selected !== 'undefined';
   }
 
-  isInside(row: number, col: number): boolean {
+  public isInside(row: number, col: number): boolean {
     return (
       row >= 0 &&
       col >= 0 &&
@@ -43,16 +43,16 @@ export class Zhed {
     );
   }
 
-  getItemAt(row: number, col: number): number;
-  getItemAt(position: Vector2): number;
-  getItemAt(arg1: any, arg2?: any): number {
+  public getItemAt(row: number, col: number): number;
+  public getItemAt(position: Vector2): number;
+  public getItemAt(arg1: any, arg2?: any): number {
     if (typeof arg1 === 'number' && typeof arg2 === 'number') {
       return this.level[arg1][arg2];
     }
     return this.level[arg1.y][arg1.x];
   }
 
-  doMove(row: number, col: number): boolean {
+  public doMove(row: number, col: number): boolean {
     if (!this.isInside(row, col)) return false;
 
     const value = this.getItemAt(row, col);
@@ -70,7 +70,7 @@ export class Zhed {
     }
   }
 
-  undoMove(): boolean {
+  public undoMove(): boolean {
     if (this.undoArray.length > 0) {
       this.popHistory();
     }
