@@ -1,25 +1,25 @@
-import { TileVector } from '../../../math/TileVector';
+import { Vector2 } from '../../../core/Vector2';
 
 export class SokobanItem {
-  private positionHistory: TileVector[];
+  private positionHistory: Vector2[];
 
   constructor(row: number, col: number) {
-    this.positionHistory = [new TileVector(row, col)];
+    this.positionHistory = [new Vector2(col, row)];
   }
 
-  get position(): TileVector {
+  get position(): Vector2 {
     return this.positionHistory[this.positionHistory.length - 1];
   }
 
   get col(): number {
-    return this.position.col;
+    return this.position.x;
   }
 
   get row(): number {
-    return this.position.row;
+    return this.position.y;
   }
 
-  get prevPosition(): TileVector {
+  get prevPosition(): Vector2 {
     if (this.positionHistory.length === 1) {
       return this.position;
     }
@@ -27,11 +27,11 @@ export class SokobanItem {
   }
 
   get prevCol(): number {
-    return this.prevPosition.col;
+    return this.prevPosition.x;
   }
 
   get prevRow(): number {
-    return this.prevPosition.row;
+    return this.prevPosition.y;
   }
 
   hasMoved(): boolean {
@@ -41,7 +41,7 @@ export class SokobanItem {
     );
   }
 
-  moveTo(position: TileVector): void {
+  moveTo(position: Vector2): void {
     this.positionHistory.push(position.clone());
   }
 

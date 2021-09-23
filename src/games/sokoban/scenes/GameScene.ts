@@ -1,7 +1,7 @@
 import 'phaser';
 import { Sokoban } from '../game/Sokoban';
 import { SokobanItem } from '../game/SokobanItem';
-import { TileVector } from '../../../math/TileVector';
+import { Vector2 } from '../../../core/Vector2';
 
 const SIZE: number = 128;
 const TWEEN_DURATION: number = 100;
@@ -151,16 +151,16 @@ export class GameScene extends Phaser.Scene {
 
     const direction = player.position.clone();
     direction.sub(player.prevPosition);
-    if (direction.equals(TileVector.UP)) {
+    if (direction.equals(Vector2.UP)) {
       this.player.setFrame(68);
     }
-    if (direction.equals(TileVector.DOWN)) {
+    if (direction.equals(Vector2.DOWN)) {
       this.player.setFrame(65);
     }
-    if (direction.equals(TileVector.LEFT)) {
+    if (direction.equals(Vector2.LEFT)) {
       this.player.setFrame(94);
     }
-    if (direction.equals(TileVector.RIGHT)) {
+    if (direction.equals(Vector2.RIGHT)) {
       this.player.setFrame(91);
     }
 
