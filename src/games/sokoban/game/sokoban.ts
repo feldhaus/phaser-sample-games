@@ -12,13 +12,13 @@ export class Sokoban {
   private player: SokobanItem;
   private crates: SokobanItem[];
 
-  static readonly FLOOR: number = 0;
-  static readonly WALL: number = 1;
-  static readonly PLAYER: number = 2;
-  static readonly GOAL: number = 4;
-  static readonly CRATE: number = 8;
+  public static readonly FLOOR: number = 0;
+  public static readonly WALL: number = 1;
+  public static readonly PLAYER: number = 2;
+  public static readonly GOAL: number = 4;
+  public static readonly CRATE: number = 8;
 
-  buildLevel(level: number[][]): void {
+  public buildLevel(level: number[][]): void {
     this.level = this.copyArray(level);
     this.rows = this.level.length;
     this.cols = this.level[0].length;
@@ -38,63 +38,63 @@ export class Sokoban {
     }
   }
 
-  getPlayer(): SokobanItem {
+  public getPlayer(): SokobanItem {
     return this.player;
   }
 
-  getCrates(): SokobanItem[] {
+  public getCrates(): SokobanItem[] {
     return this.crates;
   }
 
-  getLevelRows(): number {
+  public getLevelRows(): number {
     return this.rows;
   }
 
-  getLevelCols(): number {
+  public getLevelCols(): number {
     return this.cols;
   }
 
-  countCrates(): number {
+  public countCrates(): number {
     return this.crates.length;
   }
 
-  countCratesOnGoal(): number {
+  public countCratesOnGoal(): number {
     return this.crates.filter((crate) => this.isGoalAt(crate.position)).length;
   }
 
-  isLevelSolved(): boolean {
+  public isLevelSolved(): boolean {
     return this.countCrates() === this.countCratesOnGoal();
   }
 
-  moveLeft(): boolean {
+  public moveLeft(): boolean {
     if (this.canMove(Vector2.LEFT)) {
       return this.doMove(Vector2.LEFT);
     }
     return false;
   }
 
-  moveRight(): boolean {
+  public moveRight(): boolean {
     if (this.canMove(Vector2.RIGHT)) {
       return this.doMove(Vector2.RIGHT);
     }
     return false;
   }
 
-  moveUp(): boolean {
+  public moveUp(): boolean {
     if (this.canMove(Vector2.UP)) {
       return this.doMove(Vector2.UP);
     }
     return false;
   }
 
-  moveDown(): boolean {
+  public moveDown(): boolean {
     if (this.canMove(Vector2.DOWN)) {
       return this.doMove(Vector2.DOWN);
     }
     return false;
   }
 
-  doMove(direction: Vector2): boolean {
+  public doMove(direction: Vector2): boolean {
     this.pushHistory();
 
     const step = Vector2.add(this.player.position, direction);
@@ -122,7 +122,7 @@ export class Sokoban {
     return true;
   }
 
-  undoMove(): boolean {
+  public undoMove(): boolean {
     if (this.undoArray.length > 0) {
       this.popHistory();
       this.moves = this.moves.substring(0, this.moves.length - 1);
@@ -135,13 +135,13 @@ export class Sokoban {
     return false;
   }
 
-  getMoves(): string {
+  public getMoves(): string {
     return this.moves;
   }
 
-  getItemAt(row: number, col: number): number;
-  getItemAt(position: Vector2): number;
-  getItemAt(arg1: any, arg2?: any): number {
+  public getItemAt(row: number, col: number): number;
+  public getItemAt(position: Vector2): number;
+  public getItemAt(arg1: any, arg2?: any): number {
     if (typeof arg1 === 'number' && typeof arg2 === 'number') {
       return this.level[arg1][arg2];
     }

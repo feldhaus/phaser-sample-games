@@ -7,49 +7,49 @@ export class SokobanItem {
     this.positionHistory = [new Vector2(col, row)];
   }
 
-  get position(): Vector2 {
+  public get position(): Vector2 {
     return this.positionHistory[this.positionHistory.length - 1];
   }
 
-  get col(): number {
+  public get col(): number {
     return this.position.x;
   }
 
-  get row(): number {
+  public get row(): number {
     return this.position.y;
   }
 
-  get prevPosition(): Vector2 {
+  public get prevPosition(): Vector2 {
     if (this.positionHistory.length === 1) {
       return this.position;
     }
     return this.positionHistory[this.positionHistory.length - 2];
   }
 
-  get prevCol(): number {
+  public get prevCol(): number {
     return this.prevPosition.x;
   }
 
-  get prevRow(): number {
+  public get prevRow(): number {
     return this.prevPosition.y;
   }
 
-  hasMoved(): boolean {
+  public hasMoved(): boolean {
     return (
       this.positionHistory.length > 1 &&
       (this.col !== this.prevCol || this.row !== this.prevRow)
     );
   }
 
-  moveTo(position: Vector2): void {
+  public moveTo(position: Vector2): void {
     this.positionHistory.push(position.clone());
   }
 
-  dontMove(): void {
+  public dontMove(): void {
     this.positionHistory.push(this.position.clone());
   }
 
-  undoMove(): void {
+  public undoMove(): void {
     this.positionHistory.pop();
   }
 }
