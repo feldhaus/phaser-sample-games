@@ -1,5 +1,5 @@
-import { SokobanGame } from './games/sokoban/game';
-import { ZhedGame } from './games/zhed/game';
+import { SokobanGame } from './games/sokoban/Game';
+import { ZhedGame } from './games/zhed/Game';
 
 window.onload = () => {
   const search: URLSearchParams = new URLSearchParams(window.location.search);

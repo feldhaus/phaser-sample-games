@@ -1,5 +1,5 @@
 import 'phaser';
-import { GameScene } from './scenes/game-scene';
+import { GameScene } from './scenes/GameScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   title: 'Zhed',

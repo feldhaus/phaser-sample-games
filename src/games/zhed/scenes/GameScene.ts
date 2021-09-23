@@ -1,5 +1,5 @@
 import 'phaser';
-import { Zhed } from '../game/zhed';
+import { Zhed } from '../game/Zhed';
 
 const COLOR = {
   TILES: 0x173f35,

@@ -1,6 +1,6 @@
 import 'phaser';
-import { Sokoban } from '../game/sokoban';
-import { SokobanItem } from '../game/sokoban-item';
+import { Sokoban } from '../game/Sokoban';
+import { SokobanItem } from '../game/SokobanItem';
 import { TileVector } from '../../../math/TileVector';
 
 const SIZE: number = 128;

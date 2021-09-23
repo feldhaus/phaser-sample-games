@@ -1,4 +1,4 @@
-import { SokobanItem } from './sokoban-item';
+import { SokobanItem } from './SokobanItem';
 import { TileVector } from '../../../math/TileVector';
 
 const STRING_MOVES = 'UDLR';
