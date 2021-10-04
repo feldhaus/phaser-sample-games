@@ -1,29 +1,35 @@
+import cloneDeep from 'lodash.clonedeep';
 import { SokobanItem } from './SokobanItem';
 import { Vector2 } from '../../../core/Vector2';
 
-const STRING_MOVES = 'UDLR';
-
 export class Sokoban {
   private level: number[][];
+
   private rows: number;
+
   private cols: number;
+
   private undoArray: number[][][];
-  private moves: string;
+
   private player: SokobanItem;
+
   private crates: SokobanItem[];
 
   public static readonly FLOOR: number = 0;
+
   public static readonly WALL: number = 1;
+
   public static readonly PLAYER: number = 2;
+
   public static readonly GOAL: number = 4;
+
   public static readonly CRATE: number = 8;
 
   public buildLevel(level: number[][]): void {
-    this.level = this.copyArray(level);
+    this.level = cloneDeep(level);
     this.rows = this.level.length;
     this.cols = this.level[0].length;
     this.undoArray = [];
-    this.moves = '';
     this.crates = [];
 
     for (let row = 0; row < this.getLevelRows(); row++) {
@@ -109,23 +115,12 @@ export class Sokoban {
 
     this.movePlayer(this.player.position, step);
 
-    this.moves += STRING_MOVES.charAt(
-      direction.y === 0
-        ? direction.x === 1
-          ? 3
-          : 2
-        : direction.y === 1
-        ? 1
-        : 0
-    );
-
     return true;
   }
 
   public undoMove(): boolean {
     if (this.undoArray.length > 0) {
       this.popHistory();
-      this.moves = this.moves.substring(0, this.moves.length - 1);
       this.player.undoMove();
       this.crates.forEach((crate: SokobanItem) => {
         crate.undoMove();
@@ -135,12 +130,12 @@ export class Sokoban {
     return false;
   }
 
-  public getMoves(): string {
-    return this.moves;
-  }
-
+  // eslint-disable-next-line no-unused-vars
   public getItemAt(row: number, col: number): number;
+
+  // eslint-disable-next-line no-unused-vars
   public getItemAt(position: Vector2): number;
+
   public getItemAt(arg1: any, arg2?: any): number {
     if (typeof arg1 === 'number' && typeof arg2 === 'number') {
       return this.level[arg1][arg2];
@@ -148,30 +143,49 @@ export class Sokoban {
     return this.level[arg1.y][arg1.x];
   }
 
+  // eslint-disable-next-line no-unused-vars
   private isWalkableAt(row: number, col: number): boolean;
+
+  // eslint-disable-next-line no-unused-vars
   private isWalkableAt(position: Vector2): boolean;
+
   private isWalkableAt(arg1: any, arg2?: any): boolean {
     return (
-      this.getItemAt(arg1, arg2) === Sokoban.FLOOR ||
-      this.getItemAt(arg1, arg2) === Sokoban.GOAL
+      this.getItemAt(arg1, arg2) === Sokoban.FLOOR
+      || this.getItemAt(arg1, arg2) === Sokoban.GOAL
     );
   }
 
+  // eslint-disable-next-line no-unused-vars
   private isCrateAt(row: number, col: number): boolean;
+
+  // eslint-disable-next-line no-unused-vars
   private isCrateAt(position: Vector2): boolean;
+
   private isCrateAt(arg1: any, arg2?: any): boolean {
+    // eslint-disable-next-line no-bitwise
     return (Sokoban.CRATE & this.getItemAt(arg1, arg2)) === Sokoban.CRATE;
   }
 
+  // eslint-disable-next-line no-unused-vars
   private isPlayerAt(row: number, col: number): boolean;
+
+  // eslint-disable-next-line no-unused-vars
   private isPlayerAt(position: Vector2): boolean;
+
   private isPlayerAt(arg1: any, arg2?: any): boolean {
+    // eslint-disable-next-line no-bitwise
     return (Sokoban.PLAYER & this.getItemAt(arg1, arg2)) === Sokoban.PLAYER;
   }
 
+  // eslint-disable-next-line no-unused-vars
   private isGoalAt(row: number, col: number): boolean;
+
+  // eslint-disable-next-line no-unused-vars
   private isGoalAt(position: Vector2): boolean;
+
   private isGoalAt(arg1: any, arg2?: any): boolean {
+    // eslint-disable-next-line no-bitwise
     return (Sokoban.GOAL & this.getItemAt(arg1, arg2)) === Sokoban.GOAL;
   }
 
@@ -183,15 +197,15 @@ export class Sokoban {
   private canMove(direction: Vector2): boolean {
     const movedPlayer = Vector2.add(this.player.position, direction);
     return (
-      this.isWalkableAt(movedPlayer) ||
-      this.isPushableCrateAt(movedPlayer, direction)
+      this.isWalkableAt(movedPlayer)
+      || this.isPushableCrateAt(movedPlayer, direction)
     );
   }
 
   private moveCrate(
     crate: SokobanItem,
     fromPosition: Vector2,
-    toPosition: Vector2
+    toPosition: Vector2,
   ): void {
     crate.moveTo(toPosition);
     this.level[fromPosition.y][fromPosition.x] -= Sokoban.CRATE;
@@ -205,19 +219,11 @@ export class Sokoban {
   }
 
   private pushHistory(): void {
-    this.undoArray.push(this.copyArray(this.level));
+    this.undoArray.push(cloneDeep(this.level));
   }
 
   private popHistory(): void {
     const undoLevel = this.undoArray.pop();
-    this.level = this.copyArray(undoLevel);
-  }
-
-  private copyArray(array: number[][]): number[][] {
-    const newArray = [];
-    for (let i = 0; i < array.length; i++) {
-      newArray.push(array[i].concat());
-    }
-    return newArray;
+    this.level = cloneDeep(undoLevel);
   }
 }

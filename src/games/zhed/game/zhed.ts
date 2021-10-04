@@ -1,18 +1,25 @@
+import cloneDeep from 'lodash.clonedeep';
 import { Vector2 } from '../../../core/Vector2';
 
 export class Zhed {
   private level: number[][];
+
   private undoArray: number[][][];
+
   private selected: Vector2;
 
   public static readonly EMPTY: number = 0;
+
   public static readonly GOAL: number = 10;
+
   public static readonly STEP: number = 11;
+
   public static readonly PATH: number = 12;
+
   public static readonly LAST: number = 13;
 
   public buildLevel(level: number[][]): void {
-    this.level = this.copyArray(level);
+    this.level = cloneDeep(level);
     this.undoArray = [];
   }
 
@@ -27,7 +34,7 @@ export class Zhed {
   public isLevelSolved(): boolean {
     return !this.level
       .reduce((acc, val) => acc.concat(val), [])
-      .some(value => value === Zhed.GOAL || value === Zhed.STEP);
+      .some((value) => value === Zhed.GOAL || value === Zhed.STEP);
   }
 
   public isSelected(): boolean {
@@ -36,15 +43,19 @@ export class Zhed {
 
   public isInside(row: number, col: number): boolean {
     return (
-      row >= 0 &&
-      col >= 0 &&
-      row < this.getLevelRows() &&
-      col < this.getLevelCols()
+      row >= 0
+      && col >= 0
+      && row < this.getLevelRows()
+      && col < this.getLevelCols()
     );
   }
 
+  // eslint-disable-next-line no-unused-vars
   public getItemAt(row: number, col: number): number;
+
+  // eslint-disable-next-line no-unused-vars
   public getItemAt(position: Vector2): number;
+
   public getItemAt(arg1: any, arg2?: any): number {
     if (typeof arg1 === 'number' && typeof arg2 === 'number') {
       return this.level[arg1][arg2];
@@ -52,8 +63,8 @@ export class Zhed {
     return this.level[arg1.y][arg1.x];
   }
 
-  public doMove(row: number, col: number): boolean {
-    if (!this.isInside(row, col)) return false;
+  public doMove(row: number, col: number): void {
+    if (!this.isInside(row, col)) return;
 
     const value = this.getItemAt(row, col);
 
@@ -64,17 +75,17 @@ export class Zhed {
       this.doSelect(row, col);
     } else if (value === Zhed.STEP || value === Zhed.LAST) {
       this.doBuild(row, col);
+    // eslint-disable-next-line no-empty
     } else if (value === Zhed.PATH) {
     } else {
       this.undoMove();
     }
   }
 
-  public undoMove(): boolean {
+  public undoMove(): void {
     if (this.undoArray.length > 0) {
       this.popHistory();
     }
-    return false;
   }
 
   private doSelect(row: number, col: number): void {
@@ -132,19 +143,11 @@ export class Zhed {
   }
 
   private pushHistory(): void {
-    this.undoArray.push(this.copyArray(this.level));
+    this.undoArray.push(cloneDeep(this.level));
   }
 
   private popHistory(): void {
     const undoLevel = this.undoArray.pop();
-    this.level = this.copyArray(undoLevel);
-  }
-
-  private copyArray(array: number[][]): number[][] {
-    const newArray = [];
-    for (let i = 0; i < array.length; i++) {
-      newArray.push(array[i].concat());
-    }
-    return newArray;
+    this.level = cloneDeep(undoLevel);
   }
 }

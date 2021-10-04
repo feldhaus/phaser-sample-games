@@ -36,8 +36,8 @@ export class SokobanItem {
 
   public hasMoved(): boolean {
     return (
-      this.positionHistory.length > 1 &&
-      (this.col !== this.prevCol || this.row !== this.prevRow)
+      this.positionHistory.length > 1
+      && (this.col !== this.prevCol || this.row !== this.prevRow)
     );
   }
 

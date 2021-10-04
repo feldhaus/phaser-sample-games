@@ -1,4 +1,4 @@
-import 'phaser';
+import { GameObjects, Scene } from 'phaser';
 import { Sokoban } from '../game/Sokoban';
 import { SokobanItem } from '../game/SokobanItem';
 import { Vector2 } from '../../../core/Vector2';
@@ -6,18 +6,23 @@ import { Vector2 } from '../../../core/Vector2';
 const SIZE: number = 128;
 const TWEEN_DURATION: number = 100;
 
-export class GameScene extends Phaser.Scene {
+export class GameScene extends Scene {
   private sokoban: Sokoban;
-  private staticAssetsContainer: Phaser.GameObjects.Container;
-  private movingAssetsContainer: Phaser.GameObjects.Container;
-  private player: Phaser.GameObjects.Sprite;
-  private crates: Map<SokobanItem, Phaser.GameObjects.Sprite>;
+
+  private staticAssetsContainer: GameObjects.Container;
+
+  private movingAssetsContainer: GameObjects.Container;
+
+  private player: GameObjects.Sprite;
+
+  private crates: Map<SokobanItem, GameObjects.Sprite>;
+
   private currentLevel: number;
 
   constructor() {
     super({ key: 'Sokoban' });
     this.sokoban = new Sokoban();
-    this.crates = new Map<SokobanItem, Phaser.GameObjects.Sprite>();
+    this.crates = new Map<SokobanItem, GameObjects.Sprite>();
   }
 
   protected preload(): void {
@@ -61,12 +66,13 @@ export class GameScene extends Phaser.Scene {
   private createLevel(): void {
     for (let row = 0; row < this.sokoban.getLevelRows(); row++) {
       for (let col = 0; col < this.sokoban.getLevelCols(); col++) {
-        const position = new Phaser.Math.Vector2(col * SIZE, row * SIZE);
+        const position = new Vector2(col * SIZE, row * SIZE);
 
         this.staticAssetsContainer.add(
           this.add.sprite(position.x, position.y, 'tiles', 89),
         );
 
+        // eslint-disable-next-line default-case
         switch (this.sokoban.getItemAt(row, col)) {
           case Sokoban.WALL:
             this.staticAssetsContainer.add(
@@ -153,14 +159,11 @@ export class GameScene extends Phaser.Scene {
     direction.sub(player.prevPosition);
     if (direction.equals(Vector2.UP)) {
       this.player.setFrame(68);
-    }
-    if (direction.equals(Vector2.DOWN)) {
+    } else if (direction.equals(Vector2.DOWN)) {
       this.player.setFrame(65);
-    }
-    if (direction.equals(Vector2.LEFT)) {
+    } else if (direction.equals(Vector2.LEFT)) {
       this.player.setFrame(94);
-    }
-    if (direction.equals(Vector2.RIGHT)) {
+    } else if (direction.equals(Vector2.RIGHT)) {
       this.player.setFrame(91);
     }
 

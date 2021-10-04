@@ -1,4 +1,5 @@
-import 'phaser';
+import { GameObjects, Input, Scene } from 'phaser';
+import { Vector2 } from '../../../core/Vector2';
 import { Zhed } from '../game/Zhed';
 
 const COLOR = {
@@ -18,12 +19,17 @@ const STYLE: any = {
   align: 'center',
 };
 
-export class GameScene extends Phaser.Scene {
+export class GameScene extends Scene {
   private zhed: Zhed;
-  private board: Phaser.GameObjects.Container;
+
+  private board: GameObjects.Container;
+
   private tileSize: number;
-  private background: Phaser.GameObjects.Graphics;
-  private foreground: Phaser.GameObjects.Graphics;
+
+  private background: GameObjects.Graphics;
+
+  private foreground: GameObjects.Graphics;
+
   private currentLevel: number;
 
   constructor() {
@@ -69,7 +75,7 @@ export class GameScene extends Phaser.Scene {
     this.drawForeground();
   }
 
-  private handleTap(pointer: Phaser.Input.Pointer): void {
+  private handleTap(pointer: Input.Pointer): void {
     const col = Math.floor((pointer.x - this.board.x) / this.tileSize);
     const row = Math.floor((pointer.y - this.board.y) / this.tileSize);
     this.zhed.doMove(row, col);
@@ -104,14 +110,14 @@ export class GameScene extends Phaser.Scene {
 
     // remove all tile texts
     this.board.getAll().forEach((go) => {
-      if (go instanceof Phaser.GameObjects.Text) {
+      if (go instanceof GameObjects.Text) {
         go.destroy();
       }
     });
 
     for (let row = 0; row < this.zhed.getLevelRows(); row++) {
       for (let col = 0; col < this.zhed.getLevelCols(); col++) {
-        const position = new Phaser.Math.Vector2(
+        const position = new Vector2(
           col * this.tileSize,
           row * this.tileSize,
         );
@@ -142,7 +148,7 @@ export class GameScene extends Phaser.Scene {
 
   private drawTile(
     color: number,
-    position: Phaser.Math.Vector2,
+    position: Vector2,
     label?: string,
   ): void {
     this.foreground.fillStyle(0x111111);
@@ -170,7 +176,7 @@ export class GameScene extends Phaser.Scene {
     this.board.add(text);
   }
 
-  private drawStep(color: number, position: Phaser.Math.Vector2): void {
+  private drawStep(color: number, position: Vector2): void {
     this.foreground.fillStyle(color);
     this.foreground.fillCircle(
       position.x + this.tileSize * 0.5,

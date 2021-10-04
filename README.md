@@ -54,3 +54,5 @@ npm run dev
 [Sokoban](src/games/sokoban)
 
 [ZHED](src/games/zhed)
+
+[KnightFall](src/games/knightfall)

@@ -6,6 +6,7 @@ export class Vector2 {
    * X component of the vector.
    */
   public x: number;
+
   /**
    * Y component of the vector.
    */
@@ -15,18 +16,22 @@ export class Vector2 {
    * Shorthand for writing Vector2(0, 0).
    */
   static readonly ZERO = new Vector2(0, 0);
+
   /**
    * Shorthand for writing Vector2(0, -1).
    */
   static readonly UP = new Vector2(0, -1);
+
   /**
    * Shorthand for writing Vector2(0, 1).
    */
   static readonly DOWN = new Vector2(0, 1);
+
   /**
    * Shorthand for writing Vector2(-1, 0).
    */
   static readonly LEFT = new Vector2(-1, 0);
+
   /**
    * Shorthand for writing Vector2(1, 0).
    */
@@ -49,7 +54,7 @@ export class Vector2 {
   /**
    * Adds a value to the vector or adds it to another vector.
    * @param value A value or vector.
-   * @returns Returns the current vector. 
+   * @returns Returns the current vector.
    */
   add(value: number | Vector2): Vector2 {
     if (typeof value === 'number') {
@@ -127,8 +132,8 @@ export class Vector2 {
    */
   equals(vector: Vector2): boolean {
     return (
-      Math.abs(this.x - vector.x) < Number.EPSILON &&
-      Math.abs(this.y - vector.y) < Number.EPSILON
+      Math.abs(this.x - vector.x) < Number.EPSILON
+      && Math.abs(this.y - vector.y) < Number.EPSILON
     );
   }
 

@@ -1,7 +1,7 @@
-import 'phaser';
+import { Game } from 'phaser';
 import { config } from './Config';
 
-export class ZhedGame extends Phaser.Game {
+export class ZhedGame extends Game {
   constructor() {
     super(config);
   }
