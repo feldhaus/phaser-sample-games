@@ -56,3 +56,5 @@ npm run dev
 [ZHED](src/games/zhed)
 
 [KnightFall](src/games/knightfall) (WIP)
+
+[Sudoku](src/games/sudoku) (WIP)
