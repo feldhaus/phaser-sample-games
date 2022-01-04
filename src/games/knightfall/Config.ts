@@ -1,6 +1,6 @@
 import { AUTO, Scale, Types } from 'phaser';
 import { GameScene } from './scenes/GameScene';
-import { PreloadScene } from './scenes/PrealoadScene';
+import { PreloadScene } from './scenes/PreloadScene';
 
 export const config: Types.Core.GameConfig = {
   title: 'KnightFall',
