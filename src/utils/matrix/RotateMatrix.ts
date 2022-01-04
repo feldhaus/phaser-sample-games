@@ -14,11 +14,11 @@ export function rotateMatrix<T>(
   direction: 'left' | 'right',
 ): T[][] {
   if (direction === 'left') {
-    matrix = transposeMatrix(matrix);
     matrix = reverseMatrix(matrix);
+    matrix = transposeMatrix(matrix);
   } else if (direction === 'right') {
-    matrix = reverseMatrix(matrix);
     matrix = transposeMatrix(matrix);
+    matrix = reverseMatrix(matrix);
   }
 
   return matrix;

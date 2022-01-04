@@ -1,3 +1,4 @@
+import { KnightFallGame } from './games/knightfall/Game';
 import { SokobanGame } from './games/sokoban/Game';
 import { ZhedGame } from './games/zhed/Game';
 
@@ -13,6 +14,10 @@ window.onload = () => {
     case 'zhed':
       // eslint-disable-next-line no-new
       new ZhedGame();
+      break;
+    case 'knightfall':
+      // eslint-disable-next-line no-new
+      new KnightFallGame();
       break;
     default:
       throw Error(`${game} doesn't exist`);
