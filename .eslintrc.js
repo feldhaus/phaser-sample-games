@@ -10,15 +10,14 @@ module.exports = {
   },
   plugins: ['@typescript-eslint'],
   rules: {
-    '@typescript-eslint/lines-between-class-members': [
+    'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
+    'no-continue': 'off',
+    'no-dupe-class-members': 'off',
+    'lines-between-class-members': [
       'error',
       'always',
       { exceptAfterSingleLine: true },
     ],
-    '@typescript-eslint/comma-dangle': ['error', 'always-multiline'],
-    'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
-    'no-continue': 'off',
-    'no-dupe-class-members': 'off',
     'import/prefer-default-export': 'off',
     'import/extensions': [
       'error',

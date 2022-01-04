@@ -3,19 +3,13 @@ import { Vector2 } from '../../../core/Vector2';
 
 export class Zhed {
   private level: number[][];
-
   private undoArray: number[][][];
-
   private selected: Vector2;
 
   public static readonly EMPTY: number = 0;
-
   public static readonly GOAL: number = 10;
-
   public static readonly STEP: number = 11;
-
   public static readonly PATH: number = 12;
-
   public static readonly LAST: number = 13;
 
   public buildLevel(level: number[][]): void {

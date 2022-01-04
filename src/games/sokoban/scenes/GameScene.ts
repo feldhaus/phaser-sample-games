@@ -8,15 +8,10 @@ const TWEEN_DURATION: number = 100;
 
 export class GameScene extends Scene {
   private sokoban: Sokoban;
-
   private staticAssetsContainer: GameObjects.Container;
-
   private movingAssetsContainer: GameObjects.Container;
-
   private player: GameObjects.Sprite;
-
   private crates: Map<SokobanItem, GameObjects.Sprite>;
-
   private currentLevel: number;
 
   constructor() {

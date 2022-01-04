@@ -4,25 +4,16 @@ import { Vector2 } from '../../../core/Vector2';
 
 export class Sokoban {
   private level: number[][];
-
   private rows: number;
-
   private cols: number;
-
   private undoArray: number[][][];
-
   private player: SokobanItem;
-
   private crates: SokobanItem[];
 
   public static readonly FLOOR: number = 0;
-
   public static readonly WALL: number = 1;
-
   public static readonly PLAYER: number = 2;
-
   public static readonly GOAL: number = 4;
-
   public static readonly CRATE: number = 8;
 
   public buildLevel(level: number[][]): void {

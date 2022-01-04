@@ -21,15 +21,10 @@ const STYLE: any = {
 
 export class GameScene extends Scene {
   private zhed: Zhed;
-
   private board: GameObjects.Container;
-
   private tileSize: number;
-
   private background: GameObjects.Graphics;
-
   private foreground: GameObjects.Graphics;
-
   private currentLevel: number;
 
   constructor() {
