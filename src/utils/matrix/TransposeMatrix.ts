@@ -8,12 +8,10 @@
 export function transposeMatrix<T>(matrix: T[][]): T[][] {
   const sourceRowCount = matrix.length;
   const sourceColCount = matrix[0].length;
-
   const newMatrix = new Array(sourceColCount);
 
   for (let i = 0; i < sourceColCount; i++) {
     newMatrix[i] = new Array(sourceRowCount);
-
     for (let j = sourceRowCount - 1; j > -1; j--) {
       newMatrix[i][j] = matrix[j][i];
     }
