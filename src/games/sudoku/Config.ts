@@ -8,8 +8,8 @@ export const config: Types.Core.GameConfig = {
   scene: [PreloadScene, GameScene],
   backgroundColor: 0xf1eeeb,
   scale: {
-    width: 400,
-    height: 600,
+    width: 800,
+    height: 1200,
     parent: 'game',
     mode: Scale.FIT,
     autoCenter: Scale.CENTER_BOTH,
