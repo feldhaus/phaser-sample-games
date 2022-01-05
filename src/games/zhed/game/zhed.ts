@@ -46,10 +46,8 @@ export class Zhed {
 
   // eslint-disable-next-line no-unused-vars
   public getItemAt(row: number, col: number): number;
-
   // eslint-disable-next-line no-unused-vars
   public getItemAt(position: Vector2): number;
-
   public getItemAt(arg1: any, arg2?: any): number {
     if (typeof arg1 === 'number' && typeof arg2 === 'number') {
       return this.level[arg1][arg2];
