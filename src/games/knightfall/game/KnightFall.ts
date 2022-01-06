@@ -1,7 +1,7 @@
 import { Vector2 } from '../../../core/Vector2';
 import { getRandomElement } from '../../../utils/array/GetRandomElement';
 import { removeRandomElement } from '../../../utils/array/RemoveRandomElement';
-import { isAdjacent } from '../../../utils/grid/IsAdjacent';
+import { isAdjacent } from '../../../utils/matrix/IsAdjacent';
 import { rotateMatrix } from '../../../utils/matrix/RotateMatrix';
 import { KnightFallItem } from './KnightFallItem';
 import { KnightFallItemType } from './KnightFallItemType';

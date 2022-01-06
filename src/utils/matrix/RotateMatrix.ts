@@ -1,4 +1,5 @@
 /* eslint-disable no-param-reassign */
+
 import { reverseMatrix } from './ReverseMatrix';
 import { transposeMatrix } from './TransposeMatrix';
 
@@ -20,6 +21,7 @@ export function rotateMatrix<T>(
     matrix = transposeMatrix(matrix);
     matrix = reverseMatrix(matrix);
   }
-
   return matrix;
+  // OR
+  // return Utils.Array.Matrix.RotateMatrix(matrix, direction);
 }

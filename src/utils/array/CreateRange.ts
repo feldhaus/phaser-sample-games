@@ -12,7 +12,7 @@ export function createRange(
 ): number[] {
   // eslint-disable-next-line no-param-reassign
   if (start > stop) step *= -1;
-  const length = Math.floor(Math.abs((stop - start) / step)) + 1;
+  const length = Math.floor(Math.abs((stop - start) / step));
   const array = Array(length);
   for (let i = 0; i < length; i++) {
     array[i] = start + i * step;

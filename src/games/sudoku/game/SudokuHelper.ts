@@ -130,7 +130,7 @@ export function fillRemaining(
 }
 
 export function removeNumbers(grid: number[][], amount: number): void {
-  const availableCells = createRange(18, 9 * 9);
+  const availableCells = createRange(0, 9 * 9);
 
   while (amount > 0) {
     const cellIndex = removeRandomElement(availableCells);

@@ -16,6 +16,5 @@ export function transposeMatrix<T>(matrix: T[][]): T[][] {
       newMatrix[i][j] = matrix[j][i];
     }
   }
-
   return newMatrix;
 }

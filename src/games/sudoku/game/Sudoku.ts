@@ -1,12 +1,12 @@
 import { Vector2 } from '../../../core/Vector2';
-import { createGrid } from '../../../utils/grid/CreateGrid';
+import { createPrefilledMatrix } from '../../../utils/matrix/CreatePrefilledMatrix';
 import { fillDiagonal, fillRemaining, removeNumbers } from './SudokuHelper';
 
 export class Sudoku {
   private level: number[][];
 
   public buildLevel(): void {
-    this.level = createGrid(9, 9, 0);
+    this.level = createPrefilledMatrix(9, 9, 0);
     fillDiagonal(this.level);
     fillRemaining(this.level);
     removeNumbers(this.level, 10);
