@@ -6,7 +6,7 @@ export const config: Types.Core.GameConfig = {
   title: 'Sudoku',
   type: AUTO,
   scene: [PreloadScene, GameScene],
-  backgroundColor: 0xf1eeeb,
+  backgroundColor: 0xfff8f7,
   scale: {
     width: 800,
     height: 1200,
