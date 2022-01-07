@@ -5,60 +5,59 @@ import { removeRandomElement } from '../../../utils/array/RemoveRandomElement';
 
 // check in the row for existence
 export function unusedInRow(
-  grid: number[][],
+  matrix: number[][],
   row: number,
   num: number,
 ): boolean {
   for (let col = 0; col < 9; col++) {
-    if (grid[row][col] === num) return false;
+    if (matrix[row][col] === num) return false;
   }
   return true;
 }
 
 // check in the col for existence
 export function unusedInCol(
-  grid: number[][],
+  matrix: number[][],
   col: number,
   num: number,
 ): boolean {
   for (let row = 0; row < 9; row++) {
-    if (grid[row][col] === num) return false;
+    if (matrix[row][col] === num) return false;
   }
   return true;
 }
 
 // returns false if given 3 x 3 box contains num
 export function unusedInBox(
-  grid: number[][],
+  matrix: number[][],
   row: number,
   col: number,
   num: number,
 ): boolean {
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
-      if (grid[row + i][col + j] === num) return false;
+      if (matrix[row + i][col + j] === num) return false;
     }
   }
-
   return true;
 }
 
 // check if safe to put in cell
 export function isSafe(
-  grid: number[][],
+  matrix: number[][],
   row: number,
   col: number,
   num: number,
 ): boolean {
   return (
-    unusedInRow(grid, row, num)
-    && unusedInCol(grid, col, num)
-    && unusedInBox(grid, row - (row % 3), col - (col % 3), num)
+    unusedInRow(matrix, row, num)
+    && unusedInCol(matrix, col, num)
+    && unusedInBox(matrix, row - (row % 3), col - (col % 3), num)
   );
 }
 
 // fill a 3 x 3 box
-export function fillBox(grid: number[][], row: number, col: number): void {
+export function fillBox(matrix: number[][], row: number, col: number): void {
   let num = 0;
   // shuffleArray(numberList);
   for (let i = 0; i < 3; i++) {
@@ -66,23 +65,23 @@ export function fillBox(grid: number[][], row: number, col: number): void {
       do {
         num += 1;
         // num = numberList[Math.floor(Math.random() * numberList.length)];
-      } while (!unusedInBox(grid, row, col, num));
+      } while (!unusedInBox(matrix, row, col, num));
 
-      grid[row + i][col + j] = num;
+      matrix[row + i][col + j] = num;
     }
   }
 }
 
 // fill the diagonal boxes
-export function fillDiagonal(grid: number[][]): void {
+export function fillDiagonal(matrix: number[][]): void {
   for (let i = 0; i < 9; i += 3) {
-    fillBox(grid, i, i);
+    fillBox(matrix, i, i);
   }
 }
 
 // a recursive function to fill remaining matrix
 export function fillRemaining(
-  grid: number[][],
+  matrix: number[][],
   row: number = 0,
   col: number = 0,
 ): boolean {
@@ -120,16 +119,16 @@ export function fillRemaining(
   }
 
   for (let num = 1; num <= 9; num++) {
-    if (isSafe(grid, row, col, num)) {
-      grid[row][col] = num;
-      if (fillRemaining(grid, row, col + 1)) return true;
-      grid[row][col] = 0;
+    if (isSafe(matrix, row, col, num)) {
+      matrix[row][col] = num;
+      if (fillRemaining(matrix, row, col + 1)) return true;
+      matrix[row][col] = 0;
     }
   }
   return false;
 }
 
-export function removeNumbers(grid: number[][], amount: number): void {
+export function removeNumbers(matrix: number[][], amount: number): void {
   const availableCells = createRange(0, 9 * 9);
 
   while (amount > 0) {
@@ -138,9 +137,9 @@ export function removeNumbers(grid: number[][], amount: number): void {
     const row = Math.floor(cellIndex / 9);
     const col = cellIndex % 9;
 
-    if (grid[row][col] !== 0) {
+    if (matrix[row][col] !== 0) {
       amount -= 1;
-      grid[row][col] = 0;
+      matrix[row][col] = 0;
     }
   }
 }
