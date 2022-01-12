@@ -1,11 +1,18 @@
-import { Vector2 } from '../../core/Vector2';
-
 /**
- * Checks if two vectors (tiles) are adjacent (diagonal included).
- * @param v1 First vector to compare.
- * @param v2 Second vector to compare.
- * @returns Returns true if they are adjacent.
+ * Checks if the given nodes (row and column) are adjacents.
+ * @param a The node to be tested.
+ * @param b The node to be tested.
+ * @param diagonal If true it will check the diagonals too.
+ * @returns Returns true if nodes are adjacents.
  */
-export function isAdjacent(v1: Vector2, v2: Vector2): boolean {
-  return Math.abs(v1.x - v2.x) < 2 && Math.abs(v1.y - v2.y) < 2;
+export function isAdjacent(
+  a: { row: number; col: number },
+  b: { row: number; col: number },
+  diagonal: boolean = false,
+): boolean {
+  if (a.row === b.row && a.col === b.col) return false;
+  if (diagonal) {
+    return Math.abs(a.row - b.row) < 2 && Math.abs(a.col - b.col) < 2;
+  }
+  return Math.abs(a.row - b.row) < 1 && Math.abs(a.col - b.col) < 1;
 }
