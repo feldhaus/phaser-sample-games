@@ -72,8 +72,8 @@ export class GameScene extends Scene {
   }
 
   private createButtons(): void {
-    const { width } = this.sys.game.canvas;
-    const size = 60;
+    const { width, height } = this.sys.game.canvas;
+    const size = 80;
     const padding = 5;
     const startX = size * 0.5 + (width - (size * 9 + padding * 8)) * 0.5;
     const rect = new Geom.Rectangle(-size * 0.5, -size * 0.5, size, size);
@@ -82,7 +82,7 @@ export class GameScene extends Scene {
     for (let i = 0; i < 9; i++) {
       const btn = this.add.container();
       this.buttons.push(btn);
-      btn.setPosition(startX + i * (size + padding), 100);
+      btn.setPosition(startX + i * (size + padding), height - 100);
       btn.setInteractive(rect, Geom.Rectangle.Contains);
 
       const background = this.add.graphics();
@@ -101,7 +101,7 @@ export class GameScene extends Scene {
 
     this.foreground.beginPath();
     for (let i = 0; i < Sudoku.SIZE + 1; i++) {
-      if (i % Sudoku.BLOCK === 0) {
+      if (i % Sudoku.BOX === 0) {
         this.foreground.lineStyle(3, 0);
       } else {
         this.foreground.lineStyle(1, 0);
@@ -179,10 +179,10 @@ export class GameScene extends Scene {
 
     // draw square
     this.background.fillRect(
-      Math.floor(col / Sudoku.BLOCK) * Sudoku.BLOCK * this.tileSize,
-      Math.floor(row / Sudoku.BLOCK) * Sudoku.BLOCK * this.tileSize,
-      Sudoku.BLOCK * this.tileSize,
-      Sudoku.BLOCK * this.tileSize,
+      Math.floor(col / Sudoku.BOX) * Sudoku.BOX * this.tileSize,
+      Math.floor(row / Sudoku.BOX) * Sudoku.BOX * this.tileSize,
+      Sudoku.BOX * this.tileSize,
+      Sudoku.BOX * this.tileSize,
     );
 
     // draw current tile
@@ -195,10 +195,29 @@ export class GameScene extends Scene {
     );
   }
 
-  private setCurrentTileValue(value: number): void {
+  private setCurrentTileValue(num: number): void {
     if (this.currentRow === -1 || this.currentCol === -1) return;
-    this.textNumbers[this.currentRow][this.currentCol].visible = true;
-    this.textNumbers[this.currentRow][this.currentCol].text = String(value);
-    this.textNumbers[this.currentRow][this.currentCol].setColor('#0000ff');
+    this.sudoku.fill(this.currentRow, this.currentCol, num);
+
+    // reset text numbers color
+    for (let row = 0; row < Sudoku.SIZE; row++) {
+      for (let col = 0; col < Sudoku.SIZE; col++) {
+        this.textNumbers[row][col].setColor('#000000');
+      }
+    }
+
+    // set the used ones color as red
+    const used = this.sudoku.getUsed();
+    used.forEach((node) => {
+      this.textNumbers[node.row][node.col].setColor('#ff0000');
+    });
+
+    // set the available ones as blue
+    const available = this.sudoku.getAvailable();
+    available.forEach((node) => {
+      this.textNumbers[node.row][node.col].visible = node.num > 0;
+      this.textNumbers[node.row][node.col].text = String(node.num);
+      this.textNumbers[node.row][node.col].setColor('#0000ff');
+    });
   }
 }

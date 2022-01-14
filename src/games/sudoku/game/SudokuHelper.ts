@@ -14,6 +14,21 @@ export function unusedInRow(
   }
   return true;
 }
+// return all same numbers used in this row
+export function getUsedInRow(
+  matrix: number[][],
+  row: number,
+  col: number,
+  num: number,
+): { row: number; col: number }[] {
+  const used = [];
+  for (let j = 0; j < 9; j++) {
+    if (matrix[row][j] === num && col !== j) {
+      used.push({ row, col: j });
+    }
+  }
+  return used;
+}
 
 // check in the col for existence
 export function unusedInCol(
@@ -27,6 +42,22 @@ export function unusedInCol(
   return true;
 }
 
+// return all same numbers used in this column
+export function getUsedInCol(
+  matrix: number[][],
+  row: number,
+  col: number,
+  num: number,
+): { row: number; col: number }[] {
+  const used = [];
+  for (let i = 0; i < 9; i++) {
+    if (matrix[i][col] === num && row !== i) {
+      used.push({ row: i, col });
+    }
+  }
+  return used;
+}
+
 // returns false if given 3 x 3 box contains num
 export function unusedInBox(
   matrix: number[][],
@@ -34,12 +65,38 @@ export function unusedInBox(
   col: number,
   num: number,
 ): boolean {
+  const firstRow = row - (row % 3);
+  const firstCol = col - (col % 3);
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
-      if (matrix[row + i][col + j] === num) return false;
+      if (matrix[firstRow + i][firstCol + j] === num) return false;
     }
   }
   return true;
+}
+
+// return all same numbers used in this box
+export function getUsedInBox(
+  matrix: number[][],
+  row: number,
+  col: number,
+  num: number,
+): { row: number; col: number }[] {
+  const firstRow = row - (row % 3);
+  const firstCol = col - (col % 3);
+  const used = [];
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (
+        matrix[firstRow + i][firstCol + j] === num
+        && row !== firstRow + i
+        && col !== firstCol + j
+      ) {
+        used.push({ row: firstRow + i, col: firstCol + j });
+      }
+    }
+  }
+  return used;
 }
 
 // check if safe to put in cell
@@ -52,7 +109,7 @@ export function isSafe(
   return (
     unusedInRow(matrix, row, num)
     && unusedInCol(matrix, col, num)
-    && unusedInBox(matrix, row - (row % 3), col - (col % 3), num)
+    && unusedInBox(matrix, row, col, num)
   );
 }
 
