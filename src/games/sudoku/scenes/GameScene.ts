@@ -1,14 +1,34 @@
 import {
-  GameObjects, Geom, Input, Scene, Types,
+  GameObjects, Geom, Input, Scene,
 } from 'phaser';
 import { Sudoku } from '../game/Sudoku';
+import {
+  BOARD_TEXT_STYLE,
+  BOARD_TEXT_STYLE_FILLED,
+  BOARD_TEXT_STYLE_USED,
+  BTN_COLOR,
+  BTN_PADDING,
+  BTN_SIZE,
+  BTN_TEXT_STYLE,
+  GRID_INNER_LINE_COLOR,
+  GRID_INNER_LINE_WIDTH,
+  GRID_OUTER_LINE_COLOR,
+  GRID_OUTER_LINE_WIDTH,
+  SELECTED_LINE_COLOR,
+  SELECTED_TILE_COLOR,
+} from './Style';
 
-const STYLE: Types.GameObjects.Text.TextStyle = {
-  fontSize: '36px',
-  fontFamily: '"Lucida Console", Monaco, monospace',
-  color: '#000000',
-  align: 'center',
-};
+const KEYS = [
+  'ONE',
+  'TWO',
+  'THREE',
+  'FOUR',
+  'FIVE',
+  'SIX',
+  'SEVEN',
+  'EIGHT',
+  'NINE',
+];
 
 export class GameScene extends Scene {
   private sudoku: Sudoku;
@@ -59,7 +79,7 @@ export class GameScene extends Scene {
     for (let row = 0; row < Sudoku.SIZE; row++) {
       this.textNumbers.push([]);
       for (let col = 0; col < Sudoku.SIZE; col++) {
-        const text = this.add.text(0, 0, '0', STYLE);
+        const text = this.add.text(0, 0, '0', BOARD_TEXT_STYLE);
         this.textNumbers[row][col] = text;
         this.board.add(text);
         text.setOrigin(0.5, 0.5);
@@ -73,24 +93,25 @@ export class GameScene extends Scene {
 
   private createButtons(): void {
     const { width, height } = this.sys.game.canvas;
-    const size = 80;
-    const padding = 5;
-    const startX = size * 0.5 + (width - (size * 9 + padding * 8)) * 0.5;
-    const rect = new Geom.Rectangle(-size * 0.5, -size * 0.5, size, size);
+
+    const half = BTN_SIZE * 0.5;
+    const len = KEYS.length;
+    const sx = half + (width - (BTN_SIZE * len + BTN_PADDING * len - 1)) * 0.5;
+    const rect = new Geom.Rectangle(-half, -half, BTN_SIZE, BTN_SIZE);
 
     this.buttons = [];
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < len; i++) {
       const btn = this.add.container();
       this.buttons.push(btn);
-      btn.setPosition(startX + i * (size + padding), height - 100);
+      btn.setPosition(sx + i * (BTN_SIZE + BTN_PADDING), height - 100);
       btn.setInteractive(rect, Geom.Rectangle.Contains);
 
       const background = this.add.graphics();
       btn.add(background);
-      background.fillStyle(0x333333);
+      background.fillStyle(BTN_COLOR);
       background.fillRoundedRect(rect.x, rect.y, rect.width, rect.height, 10);
 
-      const label = this.add.text(0, 0, String(i + 1), { fontSize: '36px', color: '#ffffff' });
+      const label = this.add.text(0, 0, String(i + 1), BTN_TEXT_STYLE);
       btn.add(label);
       label.setOrigin(0.5, 0.5);
     }
@@ -102,9 +123,9 @@ export class GameScene extends Scene {
     this.foreground.beginPath();
     for (let i = 0; i < Sudoku.SIZE + 1; i++) {
       if (i % Sudoku.BOX === 0) {
-        this.foreground.lineStyle(3, 0);
+        this.foreground.lineStyle(GRID_OUTER_LINE_WIDTH, GRID_OUTER_LINE_COLOR);
       } else {
-        this.foreground.lineStyle(1, 0);
+        this.foreground.lineStyle(GRID_INNER_LINE_WIDTH, GRID_INNER_LINE_COLOR);
       }
       this.foreground.moveTo(0, i * this.tileSize);
       this.foreground.lineTo(boardSize, i * this.tileSize);
@@ -127,11 +148,10 @@ export class GameScene extends Scene {
   private inputListener(): void {
     this.input.on('pointerup', this.handleTap, this);
 
-    const keys = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE'];
-    for (let i = 0; i < keys.length; i++) {
+    for (let i = 0; i < KEYS.length; i++) {
       const btn = this.buttons[i];
 
-      const keyObj = this.input.keyboard.addKey(keys[i]);
+      const keyObj = this.input.keyboard.addKey(KEYS[i]);
       keyObj.on('down', () => {
         this.setCurrentTileValue(i + 1);
         btn.setScale(0.9);
@@ -159,7 +179,7 @@ export class GameScene extends Scene {
     this.currentCol = col;
 
     this.background.clear();
-    this.background.fillStyle(0xe5dee0);
+    this.background.fillStyle(SELECTED_LINE_COLOR);
 
     // draw row
     this.background.fillRect(
@@ -186,7 +206,7 @@ export class GameScene extends Scene {
     );
 
     // draw current tile
-    this.background.fillStyle(0xc3bbc7);
+    this.background.fillStyle(SELECTED_TILE_COLOR);
     this.background.fillRect(
       col * this.tileSize,
       row * this.tileSize,
@@ -198,18 +218,23 @@ export class GameScene extends Scene {
   private setCurrentTileValue(num: number): void {
     if (this.currentRow === -1 || this.currentCol === -1) return;
     this.sudoku.fill(this.currentRow, this.currentCol, num);
+    this.updateTextNumbers();
+  }
 
+  private updateTextNumbers(): void {
     // reset text numbers color
     for (let row = 0; row < Sudoku.SIZE; row++) {
       for (let col = 0; col < Sudoku.SIZE; col++) {
-        this.textNumbers[row][col].setColor('#000000');
+        this.textNumbers[row][col].setColor(BOARD_TEXT_STYLE.color);
       }
     }
 
     // set the used ones color as red
     const used = this.sudoku.getUsed();
     used.forEach((node) => {
-      this.textNumbers[node.row][node.col].setColor('#ff0000');
+      this.textNumbers[node.row][node.col].setColor(
+        BOARD_TEXT_STYLE_FILLED.color,
+      );
     });
 
     // set the available ones as blue
@@ -217,7 +242,9 @@ export class GameScene extends Scene {
     available.forEach((node) => {
       this.textNumbers[node.row][node.col].visible = node.num > 0;
       this.textNumbers[node.row][node.col].text = String(node.num);
-      this.textNumbers[node.row][node.col].setColor('#0000ff');
+      this.textNumbers[node.row][node.col].setColor(
+        BOARD_TEXT_STYLE_USED.color,
+      );
     });
   }
 }
