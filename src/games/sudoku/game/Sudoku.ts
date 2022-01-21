@@ -22,7 +22,7 @@ export class Sudoku {
     // fill the board and remove some values
     fillDiagonal(this.level);
     fillRemaining(this.level);
-    removeNumbers(this.level, 10);
+    removeNumbers(this.level, 30);
 
     // define which cells are interactable (editable)
     this.interactable = [];

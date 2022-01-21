@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 
 import { createRange } from '../../../utils/array/CreateRange';
+import { getRandomElement } from '../../../utils/array/GetRandomElement';
 import { removeRandomElement } from '../../../utils/array/RemoveRandomElement';
 
 // check in the row for existence
@@ -116,12 +117,11 @@ export function isSafe(
 // fill a 3 x 3 box
 export function fillBox(matrix: number[][], row: number, col: number): void {
   let num = 0;
-  // shuffleArray(numberList);
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
       do {
-        num += 1;
-        // num = numberList[Math.floor(Math.random() * numberList.length)];
+        // num += 1;
+        num = getRandomElement([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       } while (!unusedInBox(matrix, row, col, num));
 
       matrix[row + i][col + j] = num;
