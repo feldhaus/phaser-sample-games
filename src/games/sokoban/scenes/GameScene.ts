@@ -13,6 +13,7 @@ export class GameScene extends Scene {
   private player: GameObjects.Sprite;
   private crates: Map<SokobanItem, GameObjects.Sprite>;
   private currentLevel: number;
+  private isMoving: boolean;
 
   constructor() {
     super({ key: 'Sokoban' });
@@ -38,6 +39,8 @@ export class GameScene extends Scene {
     this.createPlayer();
     this.createCrates();
     this.handlers();
+
+    this.isMoving = false;
   }
 
   private setupBoard(): void {
@@ -118,27 +121,32 @@ export class GameScene extends Scene {
   }
 
   private moveUp(): void {
-    this.sokoban.moveUp();
+    if (this.isMoving) return;
+    this.isMoving = this.sokoban.moveUp();
     this.handleMovement();
   }
 
   private moveDown(): void {
-    this.sokoban.moveDown();
+    if (this.isMoving) return;
+    this.isMoving = this.sokoban.moveDown();
     this.handleMovement();
   }
 
   private moveLeft(): void {
-    this.sokoban.moveLeft();
+    if (this.isMoving) return;
+    this.isMoving = this.sokoban.moveLeft();
     this.handleMovement();
   }
 
   private moveRight(): void {
-    this.sokoban.moveRight();
+    if (this.isMoving) return;
+    this.isMoving = this.sokoban.moveRight();
     this.handleMovement();
   }
 
   private undoMove(): void {
-    this.sokoban.undoMove();
+    if (this.isMoving) return;
+    this.isMoving = this.sokoban.undoMove();
     this.handleMovement();
   }
 
@@ -175,6 +183,8 @@ export class GameScene extends Scene {
             this.scene.restart({ level: this.currentLevel + 1 });
             // tslint:disable-next-line: align
           }, 1000);
+        } else {
+          this.isMoving = false;
         }
       },
     });
