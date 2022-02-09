@@ -125,6 +125,11 @@ export class GameScene extends Scene {
           if (this.tweens.getAllTweens().every((t) => !t.isPlaying())) {
             this.canPick = true;
             this.updateSprites();
+
+            setTimeout(() => {
+              this.knightfall.fillVerticalHoles();
+              this.updateSprites();
+            }, 500);
           }
         },
       });
